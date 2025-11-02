@@ -1,7 +1,7 @@
- {
+{
   "manifest_version": 3,
   "name": "Nexos",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "description": "Nexos - Auxiliar Torre de Controle",
   "icons": {
     "16": "images/logo_r.png",
@@ -23,7 +23,15 @@
   },
   "web_accessible_resources": [
     {
-  "resources": ["trees.json", "stores.json", "images/logo.png", "inject-james-map.js", "images/content/moto.png", "images/content/carro.png", "images/content/caminhao.png"],
+      "resources": [
+        "trees.json",
+        "stores.json",
+        "images/logo.png",
+        "inject-james-map.js",
+        "images/content/moto.png",
+        "images/content/carro.png",
+        "images/content/caminhao.png"
+      ],
       "matches": ["<all_urls>"]
     }
   ],
@@ -34,19 +42,26 @@
   "content_scripts": [
     {
       "matches": [
-  "*://web.whatsapp.com/*",
-  "*://james-orkestra.backoffice.gpa.digital/*",
-  "*://picking-admin.backoffice.gpa.digital/*",
-  "*://direct.uber.com/*",
-  "*://web.lalamove.com/*",
-  "*://99app.com/*",
-  "*://mapa.james.delivery/map*"
+        "*://web.whatsapp.com/*",
+        "*://james-orkestra.backoffice.gpa.digital/*",
+        "*://picking-admin.backoffice.gpa.digital/*",
+        "*://direct.uber.com/*",
+        "*://web.lalamove.com/*",
+        "*://99app.com/*",
+        "*://mapa.james.delivery/map*"
       ],
       "js": ["content.js"],
-  "run_at": "document_idle"
+      "run_at": "document_idle"
     }
+  ],
+  "update_notes": [
+    "🔧 Correção de sincronização intermitente com o painel de pedidos.",
+    "🚀 Melhoria na performance do carregamento inicial do popup.",
+    "🧩 Adicionada compatibilidade com novos domínios de integração Uber Direct.",
+    "📦 Ajuste visual nos ícones de status de solicitação pendente.",
+    "🔔 Notificações aprimoradas para status de pedido alterado.",
+    "🌙 Suporte experimental ao modo escuro no painel interno.",
+    "⚙️ Otimização de leitura de dados do armazenamento local.",
+    "🧠 Melhoria na detecção automática de páginas compatíveis."
   ]
 }
-
-
-
