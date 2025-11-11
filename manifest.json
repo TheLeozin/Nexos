@@ -1,8 +1,9 @@
 {
   "manifest_version": 3,
   "name": "Nexos",
+  "short_name": "Nexos Torre",
   "version": "1.1.0",
-  "description": "Nexos - Auxiliar Torre de Controle",
+  "description": "Nexos - Overlays de picking, comentarios Orkestra e automacoes Uber/Lalamove/99.",
   "icons": {
     "16": "images/logo_r.png",
     "55": "images/logo_nome.png",
@@ -13,10 +14,12 @@
     "scripting",
     "storage",
     "tabs",
-    "notifications"
+    "notifications",
+    "alarms"
   ],
   "host_permissions": [
-    "https://gpabr-my.sharepoint.com/*"
+    "https://gpabr-my.sharepoint.com/*",
+    "https://raw.githubusercontent.com/*"
   ],
   "background": {
     "service_worker": "background.js"
@@ -32,7 +35,9 @@
         "images/content/carro.png",
         "images/content/caminhao.png"
       ],
-      "matches": ["<all_urls>"]
+      "matches": [
+        "<all_urls>"
+      ]
     }
   ],
   "action": {
@@ -47,7 +52,7 @@
         "*://picking-admin.backoffice.gpa.digital/*",
         "*://direct.uber.com/*",
         "*://web.lalamove.com/*",
-        "*://99app.com/*",
+        "*://entrega.99app.com/*",
         "*://mapa.james.delivery/map*"
       ],
       "js": ["content.js"],
@@ -55,13 +60,12 @@
     }
   ],
   "update_notes": [
-    "🔧 Correção de sincronização intermitente com o painel de pedidos.",
-    "🚀 Melhoria na performance do carregamento inicial do popup.",
-    "🧩 Adicionada compatibilidade com novos domínios de integração Uber Direct.",
-    "📦 Ajuste visual nos ícones de status de solicitação pendente.",
-    "🔔 Notificações aprimoradas para status de pedido alterado.",
-    "🌙 Suporte experimental ao modo escuro no painel interno.",
-    "⚙️ Otimização de leitura de dados do armazenamento local.",
-    "🧠 Melhoria na detecção automática de páginas compatíveis."
+    "Adiconado overlay de picking redesenhado com filtros Pendentes/Solicitado/Cancelado e exclusao direta.",
+    "Adiconado gerador de comentarios Orkestra com arvores condicionais, validacao de campos e envio assistido.",
+    "Adiconado botao flutuante reutilizavel, alerts/toasts acessiveis e restauro completo de foco.",
+    "Adiconado fluxo Lalamove restabelecido com selecao manual de veiculo, captura de tracking e sessao protegida.",
+    "Adiconado autofill aprimorado para Uber, Lalamove e 99 com prompts contextuais e salvamento de links.",
+    "Adiconado auto-update remoto com notificacao piscante, banner de release notes e recarregamento guiado.",
+    "Adiconado script de mapa escuro personalizado no James Delivery com Leaflet e retry dedicado."
   ]
 }
