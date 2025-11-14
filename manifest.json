@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "Nexos",
   "short_name": "Nexos Torre",
-  "version": "1.3.5",
+  "version": "1.3.7",
   "description": "Nexos - Overlays de picking, comentarios Orkestra e automacoes Uber/Lalamove/99.",
   "icons": {
     "16": "images/logo_r.png",
@@ -74,3 +74,4 @@
     "Melhorado destaque visual da palavra 'Adicionado' nas notas de atualização"
   ]
 }
+
