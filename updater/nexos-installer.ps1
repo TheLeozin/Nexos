@@ -375,41 +375,124 @@ function Start-Install {
         return
     }
 
-    # -- STEPS 2+3: Baixar e instalar extensao via updater -----------------
+    # -- STEP 2: Baixar extensao ------------------------------------------
     Set-Step 2 'active'
-    Set-Step 3 'active'
-    Set-Status 'Baixando e instalando a extensao...'
+    Set-Status 'Consultando versao disponivel...'
     Set-Progress 28
 
-    Add-Log 'Iniciando nexos-updater.ps1 -Force...'
-    $updArgs = "-noprofile -executionpolicy bypass -command `"& '$UPD_FILE' -InstallPath '$InstallPath' -Force 2>&1`""
-    $exitCode = Invoke-ProcessWithLog 'powershell.exe' $updArgs
+    try {
+        $wc2 = New-Object System.Net.WebClient
+        $wc2.Headers.Add('User-Agent', 'NexosInstaller/3.0')
+        $wc2.Headers.Add('Cache-Control', 'no-cache')
 
-    if ($exitCode -ne 0) {
-        Add-Log "ERRO: updater encerrou com codigo $exitCode"
-        Set-Step 2 'error' "Updater falhou (codigo $exitCode)"
-        Set-Step 3 'error'
-        Set-Status 'Falha ao instalar a extensao. Verifique o log.' $C_RED
+        Add-Log "Lendo latest.json..."
+        $latestRaw = $wc2.DownloadString("$RAW/latest.json")
+        $latest    = $latestRaw | ConvertFrom-Json
+        $zipUrl    = $latest.url
+        $ver       = $latest.version
+        $expHash   = ($latest.hash -replace 'sha256:', '').ToUpper()
+        Add-Log "  Versao disponivel: v$ver"
+
+        $tempDir = Join-Path $InstallPath 'temp'
+        $zipFile = Join-Path $tempDir "nexos-$ver.zip"
+
+        Add-Log "Baixando $zipUrl ..."
+        Set-Status "Baixando Nexos Torre v$ver..."
+        Set-Progress 35
+        DoUI
+
+        $wc2.DownloadFile($zipUrl, $zipFile)
+        $wc2.Dispose()
+
+        $sizeMB = [math]::Round((Get-Item $zipFile).Length / 1MB, 2)
+        Add-Log "  Download OK  ($sizeMB MB)"
+        Set-Progress 55
+        Set-Step 2 'done' "v$ver baixado ($sizeMB MB)"
+
+    } catch {
+        try { $wc2.Dispose() } catch {}
+        Add-Log "ERRO no download: $($_.Exception.Message)"
+        Set-Step 2 'error' 'Falha no download  |  verifique a conexao'
+        Set-Status 'Nao foi possivel baixar a extensao. Verifique a internet.' $C_RED
         Show-Error
         return
     }
 
-    Set-Progress 75
-    Set-Step 2 'done' 'Download e hash SHA-256 verificados'
-    Set-Step 3 'done' 'Arquivos instalados e validados'
+    # -- STEP 3: Instalar extensao ----------------------------------------
+    Set-Step 3 'active'
+    Set-Status 'Validando e instalando a extensao...'
+    Set-Progress 60
+    DoUI
+
+    try {
+        # Validar hash SHA-256
+        Add-Log "Validando SHA-256..."
+        $actualHash = (Get-FileHash $zipFile -Algorithm SHA256).Hash.ToUpper()
+        if ($expHash -and ($actualHash -ne $expHash)) {
+            Add-Log "ERRO: hash invalido!"
+            Add-Log "  Esperado: $expHash"
+            Add-Log "  Obtido:   $actualHash"
+            Set-Step 3 'error' 'Hash SHA-256 invalido  |  download corrompido'
+            Set-Status 'Arquivo corrompido. Tente novamente.' $C_RED
+            Show-Error
+            return
+        }
+        Add-Log "  Hash OK"
+        Set-Progress 68
+
+        # Extrair ZIP
+        Add-Log "Extraindo arquivos..."
+        if (Test-Path $EXT_DIR) {
+            Remove-Item $EXT_DIR -Recurse -Force -ErrorAction SilentlyContinue
+        }
+        Expand-Archive -Path $zipFile -DestinationPath $EXT_DIR -Force
+        Add-Log "  Extraido para $EXT_DIR"
+        Set-Progress 75
+
+        # Gravar version.lock
+        @{ installed = $ver; date = (Get-Date -Format 'yyyy-MM-ddTHH:mm:ssZ') } |
+            ConvertTo-Json | Set-Content -Path $VER_LOCK -Encoding UTF8
+        Add-Log "  version.lock: v$ver"
+
+        # Limpar ZIP temporario
+        Remove-Item $zipFile -Force -ErrorAction SilentlyContinue
+
+        Set-Step 3 'done' "Nexos Torre v$ver instalado e validado"
+
+    } catch {
+        Add-Log "ERRO na instalacao: $($_.Exception.Message)"
+        Set-Step 3 'error' "Falha na extracao: $($_.Exception.Message)"
+        Set-Status 'Erro ao extrair. Verifique o log.' $C_RED
+        Show-Error
+        return
+    }
 
     # -- STEP 4: Tarefa agendada -------------------------------------------
     Set-Step 4 'active'
     Set-Status 'Registrando tarefa de auto-atualizacao...'
+    Set-Progress 85
+    DoUI
 
-    $taskArgs = "-noprofile -executionpolicy bypass -command `"& '$TASK_FILE' -InstallPath '$InstallPath' 2>&1`""
-    $exitTask = Invoke-ProcessWithLog 'powershell.exe' $taskArgs
-
-    if ($exitTask -ne 0) {
-        Add-Log "AVISO: tarefa nao criada (codigo $exitTask) — updates pelo Chrome ainda funcionam"
-        Set-Step 4 'warn' 'Tarefa nao criada  |  updates via background.js do Chrome'
+    $taskOk = $false
+    if (Test-Path $TASK_FILE) {
+        try {
+            Add-Log "Criando tarefa agendada NexosUpdater..."
+            $taskArgs = "-noprofile -executionpolicy bypass -file `"$TASK_FILE`" -InstallPath `"$InstallPath`""
+            $proc = Start-Process 'powershell.exe' -ArgumentList $taskArgs -Wait -PassThru -NoNewWindow
+            $taskOk = ($proc.ExitCode -eq 0)
+            if ($taskOk) { Add-Log "  Tarefa criada com sucesso" }
+            else { Add-Log "  Aviso: codigo $($proc.ExitCode) — updates via Chrome ainda funcionam" }
+        } catch {
+            Add-Log "  Aviso: $($_.Exception.Message) — updates via Chrome ainda funcionam"
+        }
     } else {
+        Add-Log "  install-task.ps1 nao encontrado — updates via Chrome ainda funcionam"
+    }
+
+    if ($taskOk) {
         Set-Step 4 'done' 'Tarefa NexosUpdater criada  (a cada 5 min, sem admin)'
+    } else {
+        Set-Step 4 'warn' 'Tarefa nao criada  |  updates automaticos via background.js'
     }
 
     Set-Progress 94
