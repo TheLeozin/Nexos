@@ -46,7 +46,8 @@ $psArgs   = "-sta -noprofile -executionpolicy bypass -file `"$TMP_SCRIPT`" -Inst
 Write-Host '  Abrindo instalador visual...' -ForegroundColor DarkGray
 
 # Abrir janela do instalador em STA (WinForms requer STA)
-$proc = Start-Process powershell.exe -ArgumentList $psArgs -Wait -PassThru
+# -WindowStyle Hidden oculta o console do PS; o WinForms aparece normalmente
+$proc = Start-Process powershell.exe -ArgumentList $psArgs -WindowStyle Hidden -Wait -PassThru
 
 # Limpar arquivo temporario
 try { Remove-Item $TMP_SCRIPT -Force -ErrorAction SilentlyContinue } catch {}

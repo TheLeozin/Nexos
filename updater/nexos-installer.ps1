@@ -1,8 +1,8 @@
 ﻿#Requires -Version 5.1
 <#
 .SYNOPSIS
-    Nexos Torre - Instalador Visual
-    Janela WinForms com logo, steps, progresso e instrucoes finais.
+    Nexos Torre - Instalador Visual v2
+    Design profissional: sidebar escura + area de conteudo clara.
     Executar sempre em modo STA:
         powershell.exe -sta -noprofile -executionpolicy bypass -file nexos-installer.ps1
 #>
@@ -20,7 +20,6 @@ $RAW       = 'https://raw.githubusercontent.com/TheLeozin/Nexos/main'
 $UPD_URL   = "$RAW/updater/nexos-updater.ps1"
 $TASK_URL  = "$RAW/updater/install-task.ps1"
 $LOGO_URL  = "$RAW/images/logo_nome.png"
-$ICON_URL  = "$RAW/images/logo_circular.png"
 
 # --- CAMINHOS --------------------------------------------------------------
 $UPD_DIR   = Join-Path $InstallPath 'updater'
@@ -31,182 +30,212 @@ $VER_LOCK  = Join-Path $InstallPath 'version.lock'
 
 # --- PALETA ----------------------------------------------------------------
 function rgb($r,$g,$b) { [System.Drawing.Color]::FromArgb($r,$g,$b) }
+function rgba($a,$r,$g,$b) { [System.Drawing.Color]::FromArgb($a,$r,$g,$b) }
 
-$C_HEADER  = rgb 22  45  95     # azul escuro do header
-$C_HLINE   = rgb 30  60 120     # linha divisora no header
+$C_SIDE    = rgb  18  30  66    # sidebar azul-marinho profundo
+$C_SIDE2   = rgb  24  40  85    # sidebar hover/hover
+$C_ACCENT  = rgb  26 143 214    # azul acao (linha e botao)
+$C_ACCENT2 = rgb  16 110 178    # azul acao darker
 $C_WHITE   = [System.Drawing.Color]::White
-$C_BG      = rgb 248 250 253    # fundo levemente off-white
-$C_BLUE    = rgb 26  143 214    # azul acao
-$C_GREEN   = rgb 34  168 110    # verde OK
-$C_RED     = rgb 210  50  50    # vermelho erro
-$C_ORANGE  = rgb 230 140   0    # laranja aviso
-$C_GRAY    = rgb 210 218 230    # cinza pendente
-$C_TEXT    = rgb  28  32  45    # texto principal
-$C_SUB     = rgb 110 120 140    # subtexto
-$C_LOGSUB  = rgb 140 150 165    # log text
+$C_BG      = rgb 246 248 252    # fundo principal off-white
+$C_CARD    = rgb 255 255 255    # card branco
+$C_GREEN   = rgb  34 168 110    # verde OK
+$C_RED     = rgb 210  50  50    # erro
+$C_ORANGE  = rgb 220 130   0    # aviso
+$C_GRAY    = rgb 185 195 215    # pendente
+$C_TEXT    = rgb  20  28  48    # texto principal escuro
+$C_MUTED   = rgb 100 115 145    # texto secundario
+$C_BORDER  = rgb 220 228 240    # bordas suaves
+$C_LOGBG   = rgb 238 243 252    # fundo log
 
-# --- FORM PRINCIPAL --------------------------------------------------------
+# ============================================================
+#  FORM PRINCIPAL  560 x 620
+# ============================================================
 $F = New-Object System.Windows.Forms.Form
-$F.Text            = 'Nexos Torre  |  Instalador'
-$F.ClientSize      = New-Object System.Drawing.Size(560, 598)
+$F.Text            = 'Nexos Torre - Instalador'
+$F.ClientSize      = New-Object System.Drawing.Size(620, 620)
 $F.MinimumSize     = $F.Size
 $F.MaximumSize     = $F.Size
 $F.StartPosition   = 'CenterScreen'
-$F.FormBorderStyle = 'FixedDialog'
+$F.FormBorderStyle = 'FixedSingle'
 $F.MaximizeBox     = $false
 $F.BackColor       = $C_BG
 $F.Font            = New-Object System.Drawing.Font('Segoe UI', 9)
 
-# --- HEADER ----------------------------------------------------------------
-$HDR = New-Object System.Windows.Forms.Panel
-$HDR.Dock      = 'Top'
-$HDR.Height    = 116
-$HDR.BackColor = $C_HEADER
-$F.Controls.Add($HDR)
+# ============================================================
+#  SIDEBAR ESQUERDA  (180px)
+# ============================================================
+$SIDE = New-Object System.Windows.Forms.Panel
+$SIDE.Location  = New-Object System.Drawing.Point(0, 0)
+$SIDE.Size      = New-Object System.Drawing.Size(180, 620)
+$SIDE.BackColor = $C_SIDE
+$F.Controls.Add($SIDE)
 
-# Logo: caixa branca dentro do header escuro
-$LOGO_CARD = New-Object System.Windows.Forms.Panel
-$LOGO_CARD.Location  = New-Object System.Drawing.Point(18, 16)
-$LOGO_CARD.Size      = New-Object System.Drawing.Size(126, 84)
-$LOGO_CARD.BackColor = $C_WHITE
-$HDR.Controls.Add($LOGO_CARD)
-
+# Logo na sidebar
 $PIC = New-Object System.Windows.Forms.PictureBox
-$PIC.Dock      = 'Fill'
+$PIC.Location  = New-Object System.Drawing.Point(22, 28)
+$PIC.Size      = New-Object System.Drawing.Size(136, 90)
 $PIC.SizeMode  = 'Zoom'
-$PIC.BackColor = $C_WHITE
-$LOGO_CARD.Controls.Add($PIC)
+$PIC.BackColor = $C_SIDE
+$SIDE.Controls.Add($PIC)
 
-# Titulo
-$LBL_TITLE = New-Object System.Windows.Forms.Label
-$LBL_TITLE.Text      = 'Nexos Torre'
-$LBL_TITLE.Location  = New-Object System.Drawing.Point(158, 18)
-$LBL_TITLE.Size      = New-Object System.Drawing.Size(382, 40)
-$LBL_TITLE.ForeColor = $C_WHITE
-$LBL_TITLE.Font      = New-Object System.Drawing.Font('Segoe UI', 22, [System.Drawing.FontStyle]::Bold)
-$HDR.Controls.Add($LBL_TITLE)
+# Linha separadora sob o logo
+$SIDE_LINE = New-Object System.Windows.Forms.Panel
+$SIDE_LINE.Location  = New-Object System.Drawing.Point(22, 126)
+$SIDE_LINE.Size      = New-Object System.Drawing.Size(136, 1)
+$SIDE_LINE.BackColor = rgb 40 60 120
+$SIDE.Controls.Add($SIDE_LINE)
 
-$LBL_SUB = New-Object System.Windows.Forms.Label
-$LBL_SUB.Text      = 'Instalador Automatico  |  Torre de Controle GPA'
-$LBL_SUB.Location  = New-Object System.Drawing.Point(160, 64)
-$LBL_SUB.Size      = New-Object System.Drawing.Size(382, 22)
-$LBL_SUB.ForeColor = rgb 155 190 235
-$LBL_SUB.Font      = New-Object System.Drawing.Font('Segoe UI', 9)
-$HDR.Controls.Add($LBL_SUB)
+# Versao na sidebar
+$LBL_VER = New-Object System.Windows.Forms.Label
+$LBL_VER.Text      = 'v3.0.1'
+$LBL_VER.Location  = New-Object System.Drawing.Point(22, 134)
+$LBL_VER.Size      = New-Object System.Drawing.Size(136, 18)
+$LBL_VER.ForeColor = rgb 80 110 180
+$LBL_VER.Font      = New-Object System.Drawing.Font('Segoe UI', 8)
+$LBL_VER.TextAlign = 'MiddleCenter'
+$SIDE.Controls.Add($LBL_VER)
 
-# Linha azul viva na base do header
-$HDR_LINE = New-Object System.Windows.Forms.Panel
-$HDR_LINE.Dock      = 'Bottom'
-$HDR_LINE.Height    = 3
-$HDR_LINE.BackColor = $C_BLUE
-$HDR.Controls.Add($HDR_LINE)
+# Titulo na sidebar
+$LBL_PROD = New-Object System.Windows.Forms.Label
+$LBL_PROD.Text      = 'Torre de'
+$LBL_PROD.Location  = New-Object System.Drawing.Point(22, 162)
+$LBL_PROD.Size      = New-Object System.Drawing.Size(136, 20)
+$LBL_PROD.ForeColor = rgb 180 200 235
+$LBL_PROD.Font      = New-Object System.Drawing.Font('Segoe UI', 9)
+$LBL_PROD.TextAlign = 'MiddleCenter'
+$SIDE.Controls.Add($LBL_PROD)
 
-# --- STEPS -----------------------------------------------------------------
+$LBL_PROD2 = New-Object System.Windows.Forms.Label
+$LBL_PROD2.Text      = 'Controle GPA'
+$LBL_PROD2.Location  = New-Object System.Drawing.Point(22, 182)
+$LBL_PROD2.Size      = New-Object System.Drawing.Size(136, 20)
+$LBL_PROD2.ForeColor = rgb 180 200 235
+$LBL_PROD2.Font      = New-Object System.Drawing.Font('Segoe UI', 9)
+$LBL_PROD2.TextAlign = 'MiddleCenter'
+$SIDE.Controls.Add($LBL_PROD2)
+
+# Steps na sidebar (indicadores laterais)
 $STEP_DEFS = @(
-    @{ T = 'Preparando pastas';        S = 'Estrutura local em %LOCALAPPDATA%\Nexos' }
-    @{ T = 'Baixando atualizador';     S = 'nexos-updater.ps1  |  install-task.ps1' }
-    @{ T = 'Baixando extensao';        S = 'Versao mais recente do servidor Nexos' }
-    @{ T = 'Instalando extensao';      S = 'Extraindo, validando e aplicando arquivos' }
-    @{ T = 'Configurando auto-update'; S = 'Tarefa NexosUpdater  (executa a cada 5 min)' }
+    'Pastas'
+    'Atualizador'
+    'Baixando'
+    'Instalando'
+    'Auto-update'
 )
 
 $SC = @()
-$sy = 122
+$sideY = 230
 
 foreach ($i in 0..($STEP_DEFS.Count - 1)) {
-    $sd = $STEP_DEFS[$i]
+    # Icone circulo numerado
+    $SIC = New-Object System.Windows.Forms.Label
+    $SIC.Location  = New-Object System.Drawing.Point(22, $sideY)
+    $SIC.Size      = New-Object System.Drawing.Size(24, 24)
+    $SIC.BackColor = $C_GRAY
+    $SIC.ForeColor = $C_WHITE
+    $SIC.Font      = New-Object System.Drawing.Font('Segoe UI', 7.5, [System.Drawing.FontStyle]::Bold)
+    $SIC.TextAlign = 'MiddleCenter'
+    $SIC.Text      = ($i + 1).ToString()
+    $SIDE.Controls.Add($SIC)
 
-    $PN = New-Object System.Windows.Forms.Panel
-    $PN.Location  = New-Object System.Drawing.Point(0, $sy)
-    $PN.Size      = New-Object System.Drawing.Size(560, 50)
-    $PN.BackColor = $C_BG
-    $F.Controls.Add($PN)
+    # Label do step
+    $SLT = New-Object System.Windows.Forms.Label
+    $SLT.Location  = New-Object System.Drawing.Point(54, $sideY)
+    $SLT.Size      = New-Object System.Drawing.Size(110, 24)
+    $SLT.Text      = $STEP_DEFS[$i]
+    $SLT.ForeColor = rgb 130 150 190
+    $SLT.Font      = New-Object System.Drawing.Font('Segoe UI', 8.5)
+    $SLT.TextAlign = 'MiddleLeft'
+    $SIDE.Controls.Add($SLT)
 
-    # Barra lateral colorida
-    $BAR = New-Object System.Windows.Forms.Panel
-    $BAR.Location  = New-Object System.Drawing.Point(0, 4)
-    $BAR.Size      = New-Object System.Drawing.Size(4, 42)
-    $BAR.BackColor = $C_GRAY
-    $PN.Controls.Add($BAR)
-
-    # Circulo indicador (numero)
-    $IC = New-Object System.Windows.Forms.Label
-    $IC.Location  = New-Object System.Drawing.Point(16, 11)
-    $IC.Size      = New-Object System.Drawing.Size(28, 28)
-    $IC.BackColor = $C_GRAY
-    $IC.ForeColor = $C_WHITE
-    $IC.Font      = New-Object System.Drawing.Font('Segoe UI', 8, [System.Drawing.FontStyle]::Bold)
-    $IC.TextAlign = 'MiddleCenter'
-    $IC.Text      = ($i + 1).ToString()
-    $PN.Controls.Add($IC)
-
-    # Titulo do step
-    $LT = New-Object System.Windows.Forms.Label
-    $LT.Location  = New-Object System.Drawing.Point(56, 7)
-    $LT.Size      = New-Object System.Drawing.Size(488, 20)
-    $LT.Text      = $sd.T
-    $LT.Font      = New-Object System.Drawing.Font('Segoe UI', 10)
-    $LT.ForeColor = $C_SUB
-    $PN.Controls.Add($LT)
-
-    # Descricao
-    $LS = New-Object System.Windows.Forms.Label
-    $LS.Location  = New-Object System.Drawing.Point(56, 27)
-    $LS.Size      = New-Object System.Drawing.Size(488, 16)
-    $LS.Text      = $sd.S
-    $LS.Font      = New-Object System.Drawing.Font('Segoe UI', 7.5)
-    $LS.ForeColor = rgb 168 175 192
-    $PN.Controls.Add($LS)
-
-    $SC += @{ P = $PN; Bar = $BAR; Ic = $IC; Lt = $LT; Ls = $LS }
-    $sy += 50
+    $SC += @{ Ic = $SIC; Lt = $SLT }
+    $sideY += 36
 }
-# Fim dos steps: $sy = 122 + 5*50 = 372
 
-# --- SEPARADOR -------------------------------------------------------------
-$DIV = New-Object System.Windows.Forms.Panel
-$DIV.Location  = New-Object System.Drawing.Point(20, 380)
-$DIV.Size      = New-Object System.Drawing.Size(520, 1)
-$DIV.BackColor = rgb 220 226 238
-$F.Controls.Add($DIV)
+# Rodape sidebar
+$LBL_COPY = New-Object System.Windows.Forms.Label
+$LBL_COPY.Text      = 'GPA  |  2026'
+$LBL_COPY.Location  = New-Object System.Drawing.Point(22, 590)
+$LBL_COPY.Size      = New-Object System.Drawing.Size(136, 18)
+$LBL_COPY.ForeColor = rgb 50 70 120
+$LBL_COPY.Font      = New-Object System.Drawing.Font('Segoe UI', 7.5)
+$LBL_COPY.TextAlign = 'MiddleCenter'
+$SIDE.Controls.Add($LBL_COPY)
 
-# --- BARRA DE PROGRESSO ----------------------------------------------------
+# ============================================================
+#  AREA PRINCIPAL (direita, x=180)
+# ============================================================
+$W = 440   # largura da area principal
+
+# Titulo topo
+$LBL_TITLE = New-Object System.Windows.Forms.Label
+$LBL_TITLE.Text      = 'Instalacao do Nexos Torre'
+$LBL_TITLE.Location  = New-Object System.Drawing.Point(196, 26)
+$LBL_TITLE.Size      = New-Object System.Drawing.Size(400, 34)
+$LBL_TITLE.ForeColor = $C_TEXT
+$LBL_TITLE.Font      = New-Object System.Drawing.Font('Segoe UI', 18, [System.Drawing.FontStyle]::Bold)
+$F.Controls.Add($LBL_TITLE)
+
+$LBL_SUB = New-Object System.Windows.Forms.Label
+$LBL_SUB.Text      = 'Configurando sua estacao de trabalho...'
+$LBL_SUB.Location  = New-Object System.Drawing.Point(196, 62)
+$LBL_SUB.Size      = New-Object System.Drawing.Size(400, 20)
+$LBL_SUB.ForeColor = $C_MUTED
+$LBL_SUB.Font      = New-Object System.Drawing.Font('Segoe UI', 9)
+$F.Controls.Add($LBL_SUB)
+
+# Linha decorativa sob o titulo
+$TITLE_LINE = New-Object System.Windows.Forms.Panel
+$TITLE_LINE.Location  = New-Object System.Drawing.Point(196, 88)
+$TITLE_LINE.Size      = New-Object System.Drawing.Size(400, 2)
+$TITLE_LINE.BackColor = $C_BORDER
+$F.Controls.Add($TITLE_LINE)
+
+# Linha de acento colorida
+$TITLE_ACCENT = New-Object System.Windows.Forms.Panel
+$TITLE_ACCENT.Location  = New-Object System.Drawing.Point(196, 88)
+$TITLE_ACCENT.Size      = New-Object System.Drawing.Size(60, 2)
+$TITLE_ACCENT.BackColor = $C_ACCENT
+$F.Controls.Add($TITLE_ACCENT)
+
+# ---- BARRA DE PROGRESSO (abaixo do titulo) ----
 $PB = New-Object System.Windows.Forms.ProgressBar
-$PB.Location = New-Object System.Drawing.Point(20, 390)
-$PB.Size     = New-Object System.Drawing.Size(520, 10)
+$PB.Location = New-Object System.Drawing.Point(196, 100)
+$PB.Size     = New-Object System.Drawing.Size(400, 6)
 $PB.Minimum  = 0
 $PB.Maximum  = 100
 $PB.Value    = 0
 $PB.Style    = 'Continuous'
 $F.Controls.Add($PB)
 
-# --- STATUS ----------------------------------------------------------------
+# ---- STATUS (abaixo da barra) ----
 $STAT = New-Object System.Windows.Forms.Label
-$STAT.Location  = New-Object System.Drawing.Point(20, 408)
-$STAT.Size      = New-Object System.Drawing.Size(520, 18)
+$STAT.Location  = New-Object System.Drawing.Point(196, 112)
+$STAT.Size      = New-Object System.Drawing.Size(400, 18)
 $STAT.Text      = 'Aguardando inicio...'
-$STAT.Font      = New-Object System.Drawing.Font('Segoe UI', 8.5)
-$STAT.ForeColor = $C_SUB
+$STAT.Font      = New-Object System.Drawing.Font('Segoe UI', 8)
+$STAT.ForeColor = $C_MUTED
 $F.Controls.Add($STAT)
 
-# --- LOG -------------------------------------------------------------------
+# ---- LOG (caixa de texto) ----
 $LOG = New-Object System.Windows.Forms.RichTextBox
-$LOG.Location    = New-Object System.Drawing.Point(20, 432)
-$LOG.Size        = New-Object System.Drawing.Size(520, 82)
-$LOG.BackColor   = rgb 240 244 250
-$LOG.ForeColor   = $C_LOGSUB
-$LOG.Font        = New-Object System.Drawing.Font('Consolas', 7.5)
+$LOG.Location    = New-Object System.Drawing.Point(196, 136)
+$LOG.Size        = New-Object System.Drawing.Size(400, 360)
+$LOG.BackColor   = $C_LOGBG
+$LOG.ForeColor   = $C_MUTED
+$LOG.Font        = New-Object System.Drawing.Font('Consolas', 8)
 $LOG.ReadOnly    = $true
 $LOG.ScrollBars  = 'Vertical'
 $LOG.BorderStyle = 'None'
 $F.Controls.Add($LOG)
 
-# --- BOTAO FINAL -----------------------------------------------------------
+# ---- BOTAO FINAL ----
 $BTN = New-Object System.Windows.Forms.Button
-$BTN.Location  = New-Object System.Drawing.Point(20, 526)
-$BTN.Size      = New-Object System.Drawing.Size(520, 50)
+$BTN.Location  = New-Object System.Drawing.Point(196, 508)
+$BTN.Size      = New-Object System.Drawing.Size(400, 52)
 $BTN.Text      = 'Instalando, aguarde...'
-$BTN.Font      = New-Object System.Drawing.Font('Segoe UI', 11, [System.Drawing.FontStyle]::Bold)
+$BTN.Font      = New-Object System.Drawing.Font('Segoe UI', 10, [System.Drawing.FontStyle]::Bold)
 $BTN.BackColor = $C_GRAY
 $BTN.ForeColor = $C_WHITE
 $BTN.FlatStyle = 'Flat'
@@ -214,37 +243,46 @@ $BTN.FlatAppearance.BorderSize = 0
 $BTN.Enabled   = $false
 $F.Controls.Add($BTN)
 
-# --- HELPERS DE UI ---------------------------------------------------------
+# Nota sobre caminho (abaixo do botao)
+$LBL_NOTE = New-Object System.Windows.Forms.Label
+$LBL_NOTE.Location  = New-Object System.Drawing.Point(196, 566)
+$LBL_NOTE.Size      = New-Object System.Drawing.Size(400, 36)
+$LBL_NOTE.Text      = "Local de instalacao:`r`n$InstallPath"
+$LBL_NOTE.Font      = New-Object System.Drawing.Font('Segoe UI', 7.5)
+$LBL_NOTE.ForeColor = $C_MUTED
+$F.Controls.Add($LBL_NOTE)
+
+# ============================================================
+#  HELPERS DE UI
+# ============================================================
 function DoUI { [System.Windows.Forms.Application]::DoEvents() }
 
-function Set-Step([int]$i, [string]$state, [string]$sub = '') {
+function Set-Step([int]$i, [string]$state) {
     $c = $SC[$i]
     switch ($state) {
         'active' {
-            $c.Bar.BackColor = $C_BLUE
-            $c.Ic.BackColor  = $C_BLUE
-            $c.Ic.Text       = '...'
-            $c.Lt.ForeColor  = $C_TEXT
+            $c.Ic.BackColor = $C_ACCENT
+            $c.Ic.Text      = '...'
+            $c.Lt.ForeColor = $C_WHITE
+            $c.Lt.Font      = New-Object System.Drawing.Font('Segoe UI', 8.5, [System.Drawing.FontStyle]::Bold)
         }
         'done' {
-            $c.Bar.BackColor = $C_GREEN
-            $c.Ic.BackColor  = $C_GREEN
-            $c.Ic.Text       = 'OK'
-            $c.Lt.ForeColor  = $C_TEXT
+            $c.Ic.BackColor = $C_GREEN
+            $c.Ic.Text      = 'v'
+            $c.Lt.ForeColor = rgb 200 220 255
+            $c.Lt.Font      = New-Object System.Drawing.Font('Segoe UI', 8.5)
         }
         'warn' {
-            $c.Bar.BackColor = $C_ORANGE
-            $c.Ic.BackColor  = $C_ORANGE
-            $c.Ic.Text       = '!'
+            $c.Ic.BackColor = $C_ORANGE
+            $c.Ic.Text      = '!'
+            $c.Lt.ForeColor = rgb 220 200 100
         }
         'error' {
-            $c.Bar.BackColor = $C_RED
-            $c.Ic.BackColor  = $C_RED
-            $c.Ic.Text       = 'X'
-            $c.Lt.ForeColor  = $C_RED
+            $c.Ic.BackColor = $C_RED
+            $c.Ic.Text      = 'X'
+            $c.Lt.ForeColor = rgb 255 140 140
         }
     }
-    if ($sub) { $c.Ls.Text = $sub }
     DoUI
 }
 
@@ -257,7 +295,7 @@ function Add-Log([string]$msg) {
 
 function Set-Status([string]$msg, $col = $null) {
     $STAT.Text = $msg
-    if ($col) { $STAT.ForeColor = $col } else { $STAT.ForeColor = $C_SUB }
+    if ($col) { $STAT.ForeColor = $col } else { $STAT.ForeColor = $C_MUTED }
     DoUI
 }
 
@@ -266,52 +304,33 @@ function Set-Progress([int]$v) {
     DoUI
 }
 
+function Update-Subtitle([string]$msg) {
+    $LBL_SUB.Text = $msg
+    DoUI
+}
+
 function Load-Logo {
     $localLogo = Join-Path $EXT_DIR 'images\logo_nome.png'
     try {
         if (Test-Path $localLogo) {
-            $PIC.Image = [System.Drawing.Image]::FromFile($localLogo)
+            $PIC.Image    = [System.Drawing.Image]::FromFile($localLogo)
+            $PIC.BackColor = $C_SIDE
         } else {
             $tmp = "$env:TEMP\_nexos_logo_$PID.png"
             (New-Object System.Net.WebClient).DownloadFile($LOGO_URL, $tmp)
-            $PIC.Image = [System.Drawing.Image]::FromFile($tmp)
+            $PIC.Image    = [System.Drawing.Image]::FromFile($tmp)
+            $PIC.BackColor = $C_SIDE
         }
     } catch {}
     DoUI
 }
 
-# --- EXECUCAO DO UPDATER COM SAIDA EM TEMPO REAL ---------------------------
-function Invoke-ProcessWithLog([string]$exe, [string]$args) {
-    $psi = New-Object System.Diagnostics.ProcessStartInfo
-    $psi.FileName               = $exe
-    $psi.Arguments              = $args
-    $psi.RedirectStandardOutput = $true
-    $psi.RedirectStandardError  = $true
-    $psi.UseShellExecute        = $false
-    $psi.CreateNoWindow         = $true
-
-    $proc = [System.Diagnostics.Process]::Start($psi)
-
-    while (-not $proc.HasExited) {
-        while ($proc.StandardOutput.Peek() -gt -1) {
-            $line = $proc.StandardOutput.ReadLine()
-            if ($line -and $line.Trim()) { Add-Log $line }
-        }
-        DoUI
-        Start-Sleep -Milliseconds 80
-    }
-    # drenar saida restante
-    while (-not $proc.StandardOutput.EndOfStream) {
-        $line = $proc.StandardOutput.ReadLine()
-        if ($line -and $line.Trim()) { Add-Log $line }
-    }
-    return $proc.ExitCode
-}
-
-# --- INSTALAR --------------------------------------------------------------
+# ============================================================
+#  INSTALACAO
+# ============================================================
 function Start-Install {
 
-    # Verificar se ja esta instalado (e nao e forcado)
+    # Verificar se ja instalado
     if ((Test-Path $VER_LOCK) -and -not $Force) {
         try {
             $vl = Get-Content $VER_LOCK -Raw | ConvertFrom-Json
@@ -322,33 +341,27 @@ function Start-Install {
         } catch {}
     }
 
-    $ok = $true
-
-    # -- STEP 0: Criar pastas ----------------------------------------------
+    # -- STEP 0: Criar pastas -----------------------------------------------
     Set-Step 0 'active'
-    Set-Status 'Criando estrutura de pastas...'
+    Update-Subtitle 'Criando estrutura de pastas...'
     Add-Log "Destino: $InstallPath"
 
     foreach ($d in @(
-        $InstallPath,
-        $UPD_DIR,
-        $EXT_DIR,
+        $InstallPath, $UPD_DIR, $EXT_DIR,
         (Join-Path $InstallPath 'backup'),
         (Join-Path $InstallPath 'logs'),
         (Join-Path $InstallPath 'temp')
     )) {
-        if (-not (Test-Path $d)) {
-            New-Item -ItemType Directory -Path $d -Force | Out-Null
-        }
-        Add-Log "  dir OK: $(Split-Path $d -Leaf)"
+        if (-not (Test-Path $d)) { New-Item -ItemType Directory -Path $d -Force | Out-Null }
+        Add-Log "  OK: $(Split-Path $d -Leaf)"
     }
 
-    Set-Progress 10
-    Set-Step 0 'done' 'Pastas criadas com sucesso'
+    Set-Progress 8
+    Set-Step 0 'done'
 
-    # -- STEP 1: Baixar scripts --------------------------------------------
+    # -- STEP 1: Baixar scripts ----------------------------------------------
     Set-Step 1 'active'
-    Set-Status 'Baixando scripts do servidor Nexos...'
+    Update-Subtitle 'Baixando scripts do servidor Nexos...'
 
     try {
         $wc = New-Object System.Net.WebClient
@@ -357,28 +370,26 @@ function Start-Install {
 
         Add-Log "Baixando nexos-updater.ps1..."
         $wc.DownloadFile($UPD_URL, $UPD_FILE)
-        Add-Log "  OK  ($([math]::Round((Get-Item $UPD_FILE).Length/1KB,1)) KB)"
+        Add-Log "  OK ($([math]::Round((Get-Item $UPD_FILE).Length/1KB,1)) KB)"
 
         Add-Log "Baixando install-task.ps1..."
         $wc.DownloadFile($TASK_URL, $TASK_FILE)
-        Add-Log "  OK  ($([math]::Round((Get-Item $TASK_FILE).Length/1KB,1)) KB)"
+        Add-Log "  OK ($([math]::Round((Get-Item $TASK_FILE).Length/1KB,1)) KB)"
 
         $wc.Dispose()
-        Set-Progress 22
-        Set-Step 1 'done' 'nexos-updater.ps1  |  install-task.ps1 prontos'
+        Set-Progress 20
+        Set-Step 1 'done'
     } catch {
         try { $wc.Dispose() } catch {}
         Add-Log "ERRO: $($_.Exception.Message)"
-        Set-Step 1 'error' 'Falha no download — verifique a conexao'
-        Set-Status 'Nao foi possivel baixar os scripts. Verifique a internet.' $C_RED
-        Show-Error
-        return
+        Set-Step 1 'error'
+        Set-Status 'Falha no download de scripts.' $C_RED
+        Show-Error; return
     }
 
-    # -- STEP 2: Baixar extensao ------------------------------------------
+    # -- STEP 2: Baixar extensao --------------------------------------------
     Set-Step 2 'active'
-    Set-Status 'Consultando versao disponivel...'
-    Set-Progress 28
+    Update-Subtitle 'Consultando versao disponivel...'
 
     try {
         $wc2 = New-Object System.Net.WebClient
@@ -386,149 +397,119 @@ function Start-Install {
         $wc2.Headers.Add('Cache-Control', 'no-cache')
 
         Add-Log "Lendo latest.json..."
-        $latestRaw = $wc2.DownloadString("$RAW/latest.json")
-        $latest    = $latestRaw | ConvertFrom-Json
-        $zipUrl    = $latest.url
-        $ver       = $latest.version
-        $expHash   = ($latest.hash -replace 'sha256:', '').ToUpper()
+        $latest   = $wc2.DownloadString("$RAW/latest.json") | ConvertFrom-Json
+        $zipUrl   = $latest.url
+        $ver      = $latest.version
+        $expHash  = ($latest.hash -replace 'sha256:', '').ToUpper()
         Add-Log "  Versao disponivel: v$ver"
+        $LBL_VER.Text = "v$ver"
 
         $tempDir = Join-Path $InstallPath 'temp'
         $zipFile = Join-Path $tempDir "nexos-$ver.zip"
 
-        Add-Log "Baixando $zipUrl ..."
-        Set-Status "Baixando Nexos Torre v$ver..."
-        Set-Progress 35
+        Add-Log "Baixando $zipUrl..."
+        Update-Subtitle "Baixando Nexos Torre v$ver..."
+        Set-Progress 30
         DoUI
 
         $wc2.DownloadFile($zipUrl, $zipFile)
         $wc2.Dispose()
-
         $sizeMB = [math]::Round((Get-Item $zipFile).Length / 1MB, 2)
-        Add-Log "  Download OK  ($sizeMB MB)"
+        Add-Log "  Download OK ($sizeMB MB)"
         Set-Progress 55
-        Set-Step 2 'done' "v$ver baixado ($sizeMB MB)"
-
+        Set-Step 2 'done'
     } catch {
         try { $wc2.Dispose() } catch {}
-        Add-Log "ERRO no download: $($_.Exception.Message)"
-        Set-Step 2 'error' 'Falha no download  |  verifique a conexao'
-        Set-Status 'Nao foi possivel baixar a extensao. Verifique a internet.' $C_RED
-        Show-Error
-        return
+        Add-Log "ERRO: $($_.Exception.Message)"
+        Set-Step 2 'error'
+        Set-Status 'Falha no download da extensao.' $C_RED
+        Show-Error; return
     }
 
-    # -- STEP 3: Instalar extensao ----------------------------------------
+    # -- STEP 3: Instalar extensao ------------------------------------------
     Set-Step 3 'active'
-    Set-Status 'Validando e instalando a extensao...'
+    Update-Subtitle 'Validando e instalando a extensao...'
     Set-Progress 60
-    DoUI
 
     try {
-        # Validar hash SHA-256
         Add-Log "Validando SHA-256..."
         $actualHash = (Get-FileHash $zipFile -Algorithm SHA256).Hash.ToUpper()
         if ($expHash -and ($actualHash -ne $expHash)) {
             Add-Log "ERRO: hash invalido!"
             Add-Log "  Esperado: $expHash"
             Add-Log "  Obtido:   $actualHash"
-            Set-Step 3 'error' 'Hash SHA-256 invalido  |  download corrompido'
+            Set-Step 3 'error'
             Set-Status 'Arquivo corrompido. Tente novamente.' $C_RED
-            Show-Error
-            return
+            Show-Error; return
         }
         Add-Log "  Hash OK"
         Set-Progress 68
 
-        # Extrair ZIP
-        Add-Log "Extraindo arquivos..."
-        if (Test-Path $EXT_DIR) {
-            Remove-Item $EXT_DIR -Recurse -Force -ErrorAction SilentlyContinue
-        }
+        if (Test-Path $EXT_DIR) { Remove-Item $EXT_DIR -Recurse -Force -ErrorAction SilentlyContinue }
+        Add-Log "Extraindo arquivos para $EXT_DIR..."
         Expand-Archive -Path $zipFile -DestinationPath $EXT_DIR -Force
-        Add-Log "  Extraido para $EXT_DIR"
-        Set-Progress 75
+        Set-Progress 78
+        Add-Log "  Extracao OK"
 
-        # Gravar version.lock
         @{ installed = $ver; date = (Get-Date -Format 'yyyy-MM-ddTHH:mm:ssZ') } |
             ConvertTo-Json | Set-Content -Path $VER_LOCK -Encoding UTF8
         Add-Log "  version.lock: v$ver"
 
-        # Limpar ZIP temporario
         Remove-Item $zipFile -Force -ErrorAction SilentlyContinue
-
-        Set-Step 3 'done' "Nexos Torre v$ver instalado e validado"
-
+        Set-Step 3 'done'
     } catch {
-        Add-Log "ERRO na instalacao: $($_.Exception.Message)"
-        Set-Step 3 'error' "Falha na extracao: $($_.Exception.Message)"
-        Set-Status 'Erro ao extrair. Verifique o log.' $C_RED
-        Show-Error
-        return
+        Add-Log "ERRO: $($_.Exception.Message)"
+        Set-Step 3 'error'
+        Set-Status 'Falha na instalacao.' $C_RED
+        Show-Error; return
     }
 
-    # -- STEP 4: Tarefa agendada -------------------------------------------
+    # -- STEP 4: Tarefa agendada --------------------------------------------
     Set-Step 4 'active'
-    Set-Status 'Registrando tarefa de auto-atualizacao...'
-    Set-Progress 85
-    DoUI
+    Update-Subtitle 'Registrando tarefa de auto-atualizacao...'
+    Set-Progress 86
 
     $taskOk = $false
     if (Test-Path $TASK_FILE) {
         try {
-            Add-Log "Criando tarefa agendada NexosUpdater..."
-            $taskArgs = "-noprofile -executionpolicy bypass -file `"$TASK_FILE`" -InstallPath `"$InstallPath`""
-            $proc = Start-Process 'powershell.exe' -ArgumentList $taskArgs -Wait -PassThru -NoNewWindow
-            $taskOk = ($proc.ExitCode -eq 0)
-            if ($taskOk) { Add-Log "  Tarefa criada com sucesso" }
-            else { Add-Log "  Aviso: codigo $($proc.ExitCode) — updates via Chrome ainda funcionam" }
-        } catch {
-            Add-Log "  Aviso: $($_.Exception.Message) — updates via Chrome ainda funcionam"
-        }
-    } else {
-        Add-Log "  install-task.ps1 nao encontrado — updates via Chrome ainda funcionam"
+            Add-Log "Criando tarefa NexosUpdater..."
+            $p = Start-Process 'powershell.exe' -ArgumentList "-noprofile -executionpolicy bypass -file `"$TASK_FILE`" -InstallPath `"$InstallPath`"" -Wait -PassThru -WindowStyle Hidden
+            $taskOk = ($p.ExitCode -eq 0)
+            if ($taskOk) { Add-Log "  Tarefa criada" } else { Add-Log "  Aviso: cod $($p.ExitCode)" }
+        } catch { Add-Log "  Aviso: $($_.Exception.Message)" }
     }
 
-    if ($taskOk) {
-        Set-Step 4 'done' 'Tarefa NexosUpdater criada  (a cada 5 min, sem admin)'
-    } else {
-        Set-Step 4 'warn' 'Tarefa nao criada  |  updates automaticos via background.js'
-    }
+    if ($taskOk) { Set-Step 4 'done' } else { Set-Step 4 'warn' }
 
-    Set-Progress 94
+    # -- FINAL --------------------------------------------------------------
+    $verFinal = '?'
+    try { $verFinal = (Get-Content $VER_LOCK -Raw | ConvertFrom-Json).installed } catch {}
+    $LBL_VER.Text = "v$verFinal"
 
-    # -- VERSAO INSTALADA -------------------------------------------------
-    $ver = '?'
-    try { $ver = (Get-Content $VER_LOCK -Raw | ConvertFrom-Json).installed } catch {}
-
-    # Carregar logo da extensao instalada (alta qualidade)
     Load-Logo
-
     Set-Progress 100
-    Set-Status "Instalacao concluida!   Nexos Torre v$ver esta pronto." $C_GREEN
+    Update-Subtitle "Nexos Torre v$verFinal instalado com sucesso!"
+    Set-Status "Instalacao concluida!" $C_GREEN
 
-    Add-Log ''
+    Add-Log ""
     Add-Log "============================================"
-    Add-Log " PROXIMO PASSO: carregar no Chrome / Edge"
+    Add-Log "  PROXIMO PASSO: ativar no Chrome / Edge"
     Add-Log "============================================"
-    Add-Log " 1. Clique no botao abaixo para abrir o Chrome"
-    Add-Log " 2. Ative o 'Modo do desenvolvedor' (canto sup. dir.)"
-    Add-Log " 3. Clique em 'Carregar sem compactacao'"
-    Add-Log " 4. Selecione a pasta:"
-    Add-Log "    $EXT_DIR"
-    Add-Log " (o caminho sera copiado automaticamente)"
+    Add-Log "  1. Clique no botao abaixo para abrir"
+    Add-Log "     chrome://extensions"
+    Add-Log "  2. Ative 'Modo do desenvolvedor'"
+    Add-Log "  3. Clique 'Carregar sem compactacao'"
+    Add-Log "  4. Cole o caminho (ja na area de transfer.):"
+    Add-Log "     $EXT_DIR"
     Add-Log "============================================"
 
-    # Copiar caminho imediatamente
     try { $EXT_DIR | clip } catch {}
 
-    # Ativar botao
-    $capturedDir = $EXT_DIR
-    $capturedVer = $ver
-    $BTN.Text      = "  Abrir chrome://extensions    |    Nexos Torre v$capturedVer instalado"
-    $BTN.BackColor = $C_BLUE
+    $BTN.Text      = "  Abrir chrome://extensions     (caminho ja copiado!)"
+    $BTN.BackColor = $C_ACCENT
     $BTN.Enabled   = $true
 
+    $capturedDir = $EXT_DIR
     $BTN.Add_Click({
         try { $capturedDir | clip } catch {}
         $launched = $false
@@ -539,34 +520,34 @@ function Start-Install {
             "$env:LOCALAPPDATA\Microsoft\Edge\Application\msedge.exe"
         )) {
             if (Test-Path $cp) {
-                $ext = if ($cp -like '*Edge*') { 'edge://extensions/' } else { 'chrome://extensions/' }
+                if ($cp -like '*Edge*') { $ext = 'edge://extensions/' } else { $ext = 'chrome://extensions/' }
                 Start-Process $cp "--new-window $ext"
                 $launched = $true
                 break
             }
         }
         if (-not $launched) {
-            $msg = "Abra o Chrome ou Edge e acesse:`n  chrome://extensions`n`nDepois:`n 1. Ative o Modo do desenvolvedor`n 2. Carregar sem compactacao`n 3. Selecione a pasta:`n    $capturedDir`n`n(Caminho ja copiado para area de transferencia)"
-            [System.Windows.Forms.MessageBox]::Show($msg, 'Nexos Torre - Passo Final', [System.Windows.Forms.MessageBoxButtons]::OK, [System.Windows.Forms.MessageBoxIcon]::Information) | Out-Null
+            $msg = "Abra o Chrome/Edge e acesse:`n  chrome://extensions`n`nDepois:`n  1. Ative Modo do desenvolvedor`n  2. Carregar sem compactacao`n  3. Selecione (Ctrl+V):`n     $capturedDir"
+            [System.Windows.Forms.MessageBox]::Show($msg, 'Nexos Torre - Passo Final', 'OK', 'Information') | Out-Null
         }
     }.GetNewClosure())
 }
 
-# --- JA INSTALADO ----------------------------------------------------------
+# ============================================================
+#  JA INSTALADO
+# ============================================================
 function Show-AlreadyInstalled([string]$ver) {
-    # Marcar todos os steps como done
     for ($i = 0; $i -lt $SC.Count; $i++) { Set-Step $i 'done' }
     Load-Logo
     Set-Progress 100
-    Set-Status "Nexos Torre v$ver ja esta instalado e atualizado." $C_GREEN
-
-    Add-Log "Instalacao detectada: v$ver"
+    Update-Subtitle "Nexos Torre v$ver ja esta instalado."
+    Set-Status "Instalacao detectada: v$ver" $C_GREEN
+    Add-Log "Instalacao existente: v$ver"
     Add-Log "Caminho: $EXT_DIR"
-    Add-Log "(caminho copiado para area de transferencia)"
     try { $EXT_DIR | clip } catch {}
 
     $capturedDir = $EXT_DIR
-    $BTN.Text      = "  Abrir chrome://extensions    |    v$ver ja instalado"
+    $BTN.Text      = "  Abrir chrome://extensions     (caminho ja copiado!)"
     $BTN.BackColor = $C_GREEN
     $BTN.Enabled   = $true
     $BTN.Add_Click({
@@ -578,24 +559,27 @@ function Show-AlreadyInstalled([string]$ver) {
             "$env:LOCALAPPDATA\Microsoft\Edge\Application\msedge.exe"
         )) {
             if (Test-Path $cp) {
-                $ext = if ($cp -like '*Edge*') { 'edge://extensions/' } else { 'chrome://extensions/' }
-                Start-Process $cp "--new-window $ext"
-                break
+                if ($cp -like '*Edge*') { $ext = 'edge://extensions/' } else { $ext = 'chrome://extensions/' }
+                Start-Process $cp "--new-window $ext"; break
             }
         }
     }.GetNewClosure())
 }
 
-# --- ERRO ------------------------------------------------------------------
+# ============================================================
+#  ERRO
+# ============================================================
 function Show-Error {
-    $BTN.Text      = '  Instalacao falhou  |  Ver log acima  |  Clique para fechar'
+    $BTN.Text      = '  Instalacao falhou  |  Clique para fechar'
     $BTN.BackColor = $C_RED
     $BTN.Enabled   = $true
     $BTN.Add_Click({ $F.Close() })
     Set-Progress 0
 }
 
-# --- INIT ------------------------------------------------------------------
+# ============================================================
+#  INICIAR
+# ============================================================
 $F.Add_Shown({
     Load-Logo
     DoUI

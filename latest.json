@@ -1,7 +1,7 @@
 ﻿{
-    "version":  "3.0.1",
-    "url": "https://raw.githubusercontent.com/TheLeozin/Nexos/main/dist/nexos-3.0.1.zip",
-    "hash":  "sha256:7d4f22245c4188b4833fa3f7fbe68bca552776103794f50e3074390e632225df",
+    "version": "3.0.2",
+    "url": "https://raw.githubusercontent.com/TheLeozin/Nexos/main/dist/nexos-3.0.2.zip",
+    "hash": "sha256:574038e4be26f06bb00d7e69a88148bfcc5611ed243165966b7a707b4497db89",
     "releaseDate":  "2026-05-15T09:03:58Z",
     "minUpdater":  "1.0.0",
     "notes":  [
