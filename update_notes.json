@@ -1,48 +1,59 @@
-{
-  "1.4.1": [
-    "🔧 CORREÇÃO CRÍTICA: URLs de auto-update corrigidas (removido /refs/heads/ da URL do GitHub)",
-    "🛒 Volumetria fallback: quando ausente ou placeholder (—), preenche automaticamente com 'COMPRA DE MERCADO | 1'",
-    "🚫 Filtro 'NÃO USAR' na Uber: NUNCA seleciona loja com esse sufixo, sempre procura alternativa limpa",
-    "📝 Template mensagem Uber reenvio: 'Retirar pedido {numero} no setor e-commerce do Mercado {bandeira}'",
-    "✅ Sistema de release notes agora funcional com notificações e banners"
-  ],
-  "1.4.0": [
-    "🔧 CORREÇÃO CRÍTICA: URLs de auto-update apontando para repositório correto (Extens-o-Torre)",
-    "🛒 Volumetria fallback: quando ausente ou placeholder (—), preenche automaticamente com 'COMPRA DE MERCADO | 1'",
-    "🚫 Filtro 'NÃO USAR' na Uber: NUNCA seleciona loja com esse sufixo, sempre procura alternativa limpa",
-    "📝 Template mensagem Uber reenvio: 'Retirar pedido {numero} no setor e-commerce do Mercado {bandeira}'",
-    "✅ Sistema de release notes agora funcional com notificações e banners"
-  ],
-  "1.3.9": [
-    "🛒 Volumetria fallback: quando ausente ou placeholder (—), preenche automaticamente com 'COMPRA DE MERCADO | 1' e notifica o operador",
-    "🚫 Filtro 'NÃO USAR' na Uber: NUNCA seleciona loja com esse sufixo, sempre procura alternativa limpa com mesmo número",
-    "📝 Template mensagem Uber reenvio atualizado: 'Retirar pedido {numero} no setor e-commerce do Mercado {bandeira}'",
-    "🔍 Logs detalhados de seleção de loja com diagnóstico de cada opção encontrada",
-    "✅ Sanitização de labels pós-seleção para garantir exibição sem 'NÃO USAR'",
-    "📋 Sistema de release notes corrigido e sincronizado com GitHub"
-  ],
-  "1.3.8": [
-    "🛒 Volumetria fallback: quando ausente ou placeholder (—), preenche automaticamente com 'COMPRA DE MERCADO | 1' e notifica o operador",
-    "🚫 Filtro 'NÃO USAR' na Uber: NUNCA seleciona loja com esse sufixo, sempre procura alternativa limpa com mesmo número",
-    "📝 Template mensagem Uber reenvio atualizado: 'Retirar pedido {numero} no setor e-commerce do Mercado {bandeira}'",
-    "🔍 Logs detalhados de seleção de loja com diagnóstico de cada opção encontrada",
-    "✅ Sanitização de labels pós-seleção para garantir exibição sem 'NÃO USAR'"
-  ],
-  "1.3.7": [
-    "Corrigido setas duplicadas em pedidos agrupados no overlay de picking",
-    "Removido marcador [DEV] do manifest.json para produção",
-    "Desabilitado sheets-sync por padrão para maior segurança",
-    "Removido botão 'Sincronizar Pedidos Antigos' do overlay",
-    "Corrigido overflow no overlay de pedidos Solicitados",
-    "Melhorias de estabilidade e performance geral"
-  ],
-  "1.1.0": [
-    "Adicionado overlay de picking redesenhado com filtros Pendentes/Solicitado/Cancelado e exclusão direta",
-    "Adicionado gerador de comentários Orkestra com árvores condicionais, validação de campos e envio assistido",
-    "Adicionado botão flutuante reutilizável, alerts/toasts acessíveis e restauro completo de foco",
-    "Adicionado fluxo Lalamove restabelecido com seleção manual de veículo, captura de tracking e sessão protegida",
-    "Adicionado autofill aprimorado para Uber, Lalamove e 99 com prompts contextuais e salvamento de links",
-    "Adicionado auto-update remoto com notificação piscante, banner de release notes e recarregamento guiado",
-    "Adicionado script de mapa escuro personalizado no James Delivery com Leaflet e retry dedicado"
-  ]
+﻿{
+    "3.0.1":  [
+                  "fix: campo complemento no autofill Uber (4 fallbacks)",
+                  "fix: loop infinito waitForUrlUber eliminado (timeout 2min)",
+                  "feat: tracking ID Uber com retry 30s + monitor async 5min",
+                  "feat: bootstrap.ps1 - instalador 1-linha sem admin",
+                  "feat: release.ps1 - pipeline de deploy automatizado"
+              ],
+    "1.4.2":  [
+                  "ðŸŽ¨ UI do banner de atualizaÃ§Ã£o melhorada: fontes maiores e espaÃ§amento otimizado para melhor legibilidade",
+                  "ðŸ”§ Sistema de auto-update consolidado no repositÃ³rio Nexos (pÃºblico)"
+              ],
+    "1.4.1":  [
+                  "ðŸ”§ CORREÃ‡ÃƒO CRÃTICA: URLs de auto-update corrigidas (removido /refs/heads/ da URL do GitHub)",
+                  "ðŸ›’ Volumetria fallback: quando ausente ou placeholder (â€”), preenche automaticamente com \u0027COMPRA DE MERCADO | 1\u0027",
+                  "ðŸš« Filtro \u0027NÃƒO USAR\u0027 na Uber: NUNCA seleciona loja com esse sufixo, sempre procura alternativa limpa",
+                  "ðŸ“ Template mensagem Uber reenvio: \u0027Retirar pedido {numero} no setor e-commerce do Mercado {bandeira}\u0027",
+                  "âœ… Sistema de release notes agora funcional com notificaÃ§Ãµes e banners"
+              ],
+    "1.4.0":  [
+                  "ðŸ”§ CORREÃ‡ÃƒO CRÃTICA: URLs de auto-update apontando para repositÃ³rio correto (Extens-o-Torre)",
+                  "ðŸ›’ Volumetria fallback: quando ausente ou placeholder (â€”), preenche automaticamente com \u0027COMPRA DE MERCADO | 1\u0027",
+                  "ðŸš« Filtro \u0027NÃƒO USAR\u0027 na Uber: NUNCA seleciona loja com esse sufixo, sempre procura alternativa limpa",
+                  "ðŸ“ Template mensagem Uber reenvio: \u0027Retirar pedido {numero} no setor e-commerce do Mercado {bandeira}\u0027",
+                  "âœ… Sistema de release notes agora funcional com notificaÃ§Ãµes e banners"
+              ],
+    "1.3.9":  [
+                  "ðŸ›’ Volumetria fallback: quando ausente ou placeholder (â€”), preenche automaticamente com \u0027COMPRA DE MERCADO | 1\u0027 e notifica o operador",
+                  "ðŸš« Filtro \u0027NÃƒO USAR\u0027 na Uber: NUNCA seleciona loja com esse sufixo, sempre procura alternativa limpa com mesmo nÃºmero",
+                  "ðŸ“ Template mensagem Uber reenvio atualizado: \u0027Retirar pedido {numero} no setor e-commerce do Mercado {bandeira}\u0027",
+                  "ðŸ” Logs detalhados de seleÃ§Ã£o de loja com diagnÃ³stico de cada opÃ§Ã£o encontrada",
+                  "âœ… SanitizaÃ§Ã£o de labels pÃ³s-seleÃ§Ã£o para garantir exibiÃ§Ã£o sem \u0027NÃƒO USAR\u0027",
+                  "ðŸ“‹ Sistema de release notes corrigido e sincronizado com GitHub"
+              ],
+    "1.3.8":  [
+                  "ðŸ›’ Volumetria fallback: quando ausente ou placeholder (â€”), preenche automaticamente com \u0027COMPRA DE MERCADO | 1\u0027 e notifica o operador",
+                  "ðŸš« Filtro \u0027NÃƒO USAR\u0027 na Uber: NUNCA seleciona loja com esse sufixo, sempre procura alternativa limpa com mesmo nÃºmero",
+                  "ðŸ“ Template mensagem Uber reenvio atualizado: \u0027Retirar pedido {numero} no setor e-commerce do Mercado {bandeira}\u0027",
+                  "ðŸ” Logs detalhados de seleÃ§Ã£o de loja com diagnÃ³stico de cada opÃ§Ã£o encontrada",
+                  "âœ… SanitizaÃ§Ã£o de labels pÃ³s-seleÃ§Ã£o para garantir exibiÃ§Ã£o sem \u0027NÃƒO USAR\u0027"
+              ],
+    "1.3.7":  [
+                  "Corrigido setas duplicadas em pedidos agrupados no overlay de picking",
+                  "Removido marcador [DEV] do manifest.json para produÃ§Ã£o",
+                  "Desabilitado sheets-sync por padrÃ£o para maior seguranÃ§a",
+                  "Removido botÃ£o \u0027Sincronizar Pedidos Antigos\u0027 do overlay",
+                  "Corrigido overflow no overlay de pedidos Solicitados",
+                  "Melhorias de estabilidade e performance geral"
+              ],
+    "1.1.0":  [
+                  "Adicionado overlay de picking redesenhado com filtros Pendentes/Solicitado/Cancelado e exclusÃ£o direta",
+                  "Adicionado gerador de comentÃ¡rios Orkestra com Ã¡rvores condicionais, validaÃ§Ã£o de campos e envio assistido",
+                  "Adicionado botÃ£o flutuante reutilizÃ¡vel, alerts/toasts acessÃ­veis e restauro completo de foco",
+                  "Adicionado fluxo Lalamove restabelecido com seleÃ§Ã£o manual de veÃ­culo, captura de tracking e sessÃ£o protegida",
+                  "Adicionado autofill aprimorado para Uber, Lalamove e 99 com prompts contextuais e salvamento de links",
+                  "Adicionado auto-update remoto com notificaÃ§Ã£o piscante, banner de release notes e recarregamento guiado",
+                  "Adicionado script de mapa escuro personalizado no James Delivery com Leaflet e retry dedicado"
+              ]
 }

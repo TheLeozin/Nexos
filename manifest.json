@@ -1,80 +1,285 @@
-{
-  "manifest_version": 3,
-  "name": "Nexos",
-  "short_name": "Nexos Torre",
-  "version": "1.4.2",
-  "description": "Nexos - Overlays de picking, comentarios Orkestra e automacoes Uber/Lalamove/99.",
-  "icons": {
-    "16": "images/logo_r.png",
-    "55": "images/logo_nome.png",
-    "128": "images/logo.png"
-  },
-  "permissions": [
-    "activeTab",
-    "scripting",
-    "storage",
-    "tabs",
-    "notifications",
-    "alarms"
-  ],
-  "host_permissions": [
-    "https://gpabr-my.sharepoint.com/*",
-    "https://raw.githubusercontent.com/*"
-  ],
-  "background": {
-    "service_worker": "background.js"
-  },
-  "web_accessible_resources": [
-    {
-      "resources": [
-        "trees.json",
-        "stores.json",
-        "images/logo.png",
-        "inject-james-map.js",
-        "images/content/moto.png",
-        "images/content/carro.png",
-        "images/content/caminhao.png"
-      ],
-      "matches": [
-        "<all_urls>"
-      ]
-    }
-  ],
-  "action": {
-    "default_popup": "popup.html",
-    "default_title": "Nexos - Ativar"
-  },
-  "content_scripts": [
-    {
-      "matches": [
-        "*://web.whatsapp.com/*",
-        "*://james-orkestra.backoffice.gpa.digital/*",
-        "*://picking-admin.backoffice.gpa.digital/*",
-        "*://direct.uber.com/*",
-        "*://web.lalamove.com/*",
-        "*://entrega.99app.com/*",
-        "*://mapa.james.delivery/map*"
-      ],
-      "js": ["content.js"],
-      "run_at": "document_idle"
-    }
-  ],
-  "update_notes": [
-    "Corrigido exibição de setas duplicadas nos pedidos agrupados",
-    "Corrigido ordem de exibição agora mostra 'Loja • Pedido'",
-    "Corrigido contagem de pedidos agrupados exibida corretamente",
-    "Adicionado número da loja ao lado do pedido em todas as abas",
-    "Adicionado sincronização automática de pedidos com Google Sheets",
-    "Adicionado destaque visual em ciano para número da loja",
-    "Corrigido detecção de campo telefone no Lalamove modo retirada",
-    "Corrigido aba Pendente não carregava pedidos corretamente",
-    "Adicionado overlay de carregamento ao enviar comentários no Orkestra",
-    "Adicionado validação imediata do campo 'link da plataforma' ao colar URLs",
-    "Melhorado design do botão flutuante com gradiente e efeito hover",
-    "Melhorado destaque visual da palavra 'Adicionado' nas notas de atualização"
-  ]
+﻿{
+    "manifest_version":  3,
+    "key":  "MIIEvAIBADANBgkqhkiG9w0BAQEFAASCBKYwggSiAgEAAoIBAQCp98Gy7A+4SP7fVZUuA4bwGmnSW5cLHEviY9eYbTAy26XumzjhGuWqAXNw7uFEQRl6OfLqCriB/UAxrBGUyymd/R7nKYim/KdDIfJpwxLZWwfb42hg7HPer/m+GsE5uaU+1h4JvzalE1pI4INyCVvJ0ZhuVtGk1uoZZ0aH5IcCrxAF1QWtPvphHNNtZ3YuyZbFANE7CvOkmacp45MrTMyBzZKo7W/nDRub80z3kOwh9dDL/YBqX3w6qXRO/Dwr3843l8uCCDWfXWQXof8Vi4Znkx/wihiUtGAqh25YZFIN7kjW5ziqYkg/Yqv5gAXoR5jOk89iMDUwNA4oBrTyX43vAgMBAAECggEABeoVpuy49VAw8kOPn9zGjsdUhFnkjSHscBHKWEcAZNyozv8+wPKHKF3JjxX457+eK9clYUiDOB7AY5oZuIRDS/iZYTDcTPdAuMDPJyf/GWomAVxN7wV7WLXl6lwS+jfADMo1nGA3fhII071gRZEWzRSKidhijipeVgj2dtcYbZrsTE61vu65KQ+DbFsVANXLo3+1nH+xtSltEZdRfxa8ysN80hU2oPmsXZoksSV3HMH3xSR+zJvNZZBTeUWspFqBIZw2ENkzt3RKuKs99ZgrAS5r5OXV8jAi9hDhKEJF8aA0LL3VXELYU0UCeCHUUjG4OCjDi9LAPajlc5JbQOs3hQKBgQDmiBIDXQaqI1FeKl6u9I0U5tjDxb6UrZ2Hc9th+r5qccFrGzg2V5h3OS1MyeofprRAZBeY2t/BmTBOtdeEQ5A/ENlFVCynRUqmXrMCQnOuiX+pK4KOxJhzcAke6mPJEDOgBC1lHXXBkpsNWrymN4/ZKVI2C3bb3RaRfwCHNwBO4wKBgQC8vtAxceZ35Fz/+Avv7fse/kdcEfk43rj4BtAcQ6tqJR7HkRJfpm8o0S0hisAVXeRjb1VTQjMAW1gjrcgsQfyo5rhGL7xlz1LgMH2J1ip3dNggzUEkquMM3fv0thQLgAq4btEqCH6sfgsrxCrEU0KQHmHn2iR9eyzagoq3cHHGhQKBgBu8cVZgQeYEe8y1klDAcZz7LUdYqlZfER3z7Yg7T9+ksh2916SKI3jssyuS+401VGiO4lvssZEsaih+LmDmdBtyXoG93+V8K8AakrUJ47szJd3nszyUILd62k4S61CMl3mAJyoMQle42NjheuMQukjpdM+1z2Yiko2M1zZtgqb7AoGAbgbd3rUDIMji3eR/MPKN/VdFygpAOkK7mPp/vrpD5rCU7MlI6LFhA25M3MzBhLMjPEPefZaNnJujGcloc0RUQTGeImwZa1Acg8xAomVShCh9BUIhw3pKuWl+Qv0RWlLd7P3MuLATCALCCFVmiOPwXYsYj8u+kdeIIikPLDhEWvECgYB1jVcE1R0Z2Hy6QEFmQ0lLK1zX45UaHALZOV3/dYuUG6B3CgC4un8N6eIabear+CBSq91i6zryUY6HzVrDEJcqrpj6jn5lwxWEbZ2EZcwVbBlo/t8122NeonDcmlWtmcZNtEPb12WAmUntlZmT+3M3vZgBd/XvVao8AVuFIAaW0A==",
+    "name":  "Nexos Torre",
+    "short_name":  "Nexos",
+    "version":  "3.0.1",
+    "description":  "Nexos Torre v3.0 - AutenticaÃ§Ã£o SharePoint-exclusive com Chrome Identity API. SoluÃ§Ã£o corporativa integrada com Microsoft 365 para gestÃ£o de pedidos e automaÃ§Ãµes multi-plataforma.",
+    "icons":  {
+                  "16":  "images/logo.png",
+                  "32":  "images/logo.png",
+                  "48":  "images/logo.png",
+                  "128":  "images/logo.png"
+              },
+    "permissions":  [
+                        "activeTab",
+                        "scripting",
+                        "storage",
+                        "tabs",
+                        "tabGroups",
+                        "notifications",
+                        "alarms",
+                        "webRequest",
+                        "identity",
+                        "windows"
+                    ],
+    "host_permissions":  [
+                             "https://gpabr.sharepoint.com/*",
+                             "https://graph.microsoft.com/*",
+                             "https://login.microsoftonline.com/*",
+                             "https://raw.githubusercontent.com/*",
+                             "https://*.chromiumapp.org/*",
+                             "https://avt-backend.instaleap.io/*",
+                             "https://control.instaleap.io/*",
+                             "https://api-gtw-prod.backoffice.gpa.digital/*",
+                             "https://picking-admin.backoffice.gpa.digital/*",
+                             "https://graph.microsoft.com/*",
+                             "https://gpabr.sharepoint.com/*"
+                         ],
+    "background":  {
+                       "service_worker":  "background.js"
+                   },
+    "web_accessible_resources":  [
+                                     {
+                                         "resources":  [
+                                                           "trees.json",
+                                                           "stores.json",
+                                                           "core/knowledge-base.json",
+                                                           "core/smart-search.js",
+                                                           "core/console-silencer.js",
+                                                           "msal-browser.min.js",
+                                                           "images/logo.png",
+                                                           "inject-james-map.js",
+                                                           "images/content/moto.png",
+                                                           "images/content/carro.png",
+                                                           "images/content/caminhao.png",
+                                                           "styles/nexos-design-system.css",
+                                                           "core/loader.js",
+                                                           "core/graph-client.js",
+                                                           "core/update-engine.js",
+                                                           "core/migration-engine.js",
+                                                           "core/nexos-ui-components.js",
+                                                           "core/nexos-auth-system.js",
+                                                           "core/nexos-user-manager.js",
+                                                           "core/nexos-overlay-template.js",
+                                                           "core/nexos-ai-assistant.js",
+                                                           "core/expose-picking-overlay.js",
+                                                           "core/picking-state-manager.js",
+                                                           "core/picking-lock-manager.js",
+                                                           "core/picking-timeline-manager.js",
+                                                           "core/picking-queue-manager.js",
+                                                           "core/picking-platform-manager.js",
+                                                           "core/picking-context-detector.js",
+                                                           "core/picking-init.js",
+                                                           "core/picking-overlay-v3.js",
+                                                           "core/picking-overlay-styles.css",
+                                                           "core/sharepoint/picking-sharepoint-manager.js",
+                                                           "core/picking-timeline-sharepoint.js",
+                                                           "core/picking-queue-sharepoint.js",
+                                                           "core/auth/instaleap-token-interceptor.js",
+                                                           "core/auth/msal-auth.js",
+                                                           "core/auth/unified-auth-service.js",
+                                                           "core/auth/unified-auth-manager.js",
+                                                           "core/auth/oauth-client.js",
+                                                           "core/auth/token-manager.js",
+                                                           "core/auth/auth-helper.js",
+                                                           "core/auth/auto-login-handler.js",
+                                                           "core/auth/token-sync-diagnostic.js",
+                                                           "core/auth/auth-token-service.js",
+                                                           "tests/token-vault-manager.js",
+                                                           "core/auth/auth-token-service-v2.js",
+                                                           "migrations/migrate-to-sharepoint.js",
+                                                           "core/sharepoint/graph-client-init.js",
+                                                           "core/storage/storage-adapter.js",
+                                                           "core/storage/storage-init.js",
+                                                           "core/sharepoint/graph-client.js",
+                                                           "core/logging/log-manager.js",
+                                                           "core/permissions/roles.js",
+                                                           "core/notifications/notification-manager.js",
+                                                           "core/reports/report-exporter.js",
+                                                           "core/realtime/live-dashboard.js",
+                                                           "core/supervision/supervision-manager.js",
+                                                           "core/auth/msal-auth.js",
+                                                           "core/auth/graph-client.js",
+                                                           "admin/user-role-manager.js",
+                                                           "tests/test-microsoft-auth.js",
+                                                           "tests/test-picking-v3.js",
+                                                           "tests/test-picking-v3-improved.js",
+                                                           "tests/test-components.js",
+                                                           "tests/test-components.html",
+                                                           "tests/apply-fixes-v3.js",
+                                                           "tests/enhanced-modal.js",
+                                                           "tests/test-completo-console.js",
+                                                           "config/sharepoint-config.js",
+                                                           "config/app-config.js",
+                                                           "config/azure-ad-config.js",
+                                                           "tests/test-approval-history.js",
+                                                           "tests/test-sharepoint-connection.js",
+                                                           "tests/test-sharepoint-standalone.js",
+                                                           "tests/test-sharepoint-standalone-fixed.js",
+                                                           "tests/test-sharepoint-wait.js",
+                                                           "tests/check-modules.js",
+                                                           "auth-callback.html",
+                                                           "auth-callback.js",
+                                                           "tests/auth-test.html",
+                                                           "tests/auth-test.js",
+                                                           "tests/oauth-callback.html",
+                                                           "tests/storage-test.html",
+                                                           "tests/storage-test.js",
+                                                           "tests/test-picking-auth.html",
+                                                           "tests/debug-auth-flow.html",
+                                                           "tests/diagnostic-design-system.html",
+                                                           "tests/diagnostic-design-system.js",
+                                                           "content-99app.js",
+                                                           "inject-instaleap-order-filter.js"
+                                                       ],
+                                         "matches":  [
+                                                         "\u003call_urls\u003e"
+                                                     ]
+                                     },
+                                     {
+                                         "resources":  [
+                                                           "admin.html",
+                                                           "monitor-pedidos-armazenados.html",
+                                                           "monitor-pedidos-armazenados.js",
+                                                           "monitor-pedidos-armazenados.css",
+                                                           "core/nexos-user-manager.js",
+                                                           "core/nexos-auth-system.js",
+                                                           "core/auth/msal-auth.js",
+                                                           "msal-browser.min.js",
+                                                           "config/azure-ad-config.js"
+                                                       ],
+                                         "matches":  [
+                                                         "\u003call_urls\u003e"
+                                                     ]
+                                     }
+                                 ],
+    "action":  {
+                   "default_popup":  "popup.html",
+                   "default_title":  "Nexos - Ativar"
+               },
+    "options_page":  "admin/admin.html",
+    "content_scripts":  [
+                            {
+                                "matches":  [
+                                                "*://control.instaleap.io/*"
+                                            ],
+                                "js":  [
+                                           "core/auth/instaleap-token-interceptor.js"
+                                       ],
+                                "run_at":  "document_start",
+                                "all_frames":  false
+                            },
+                            {
+                                "matches":  [
+                                                "*://web.whatsapp.com/*"
+                                            ],
+                                "css":  [
+                                            "styles/nexos-design-system.css"
+                                        ],
+                                "js":  [
+                                           "core/nexos-ui-components.js",
+                                           "core/nexos-auth-system.js",
+                                           "core/nexos-overlay-template.js",
+                                           "whatsapp-helper.js"
+                                       ],
+                                "run_at":  "document_idle"
+                            },
+                            {
+                                "matches":  [
+                                                "*://james-orkestra.backoffice.gpa.digital/*",
+                                                "*://picking-admin.backoffice.gpa.digital/*",
+                                                "*://direct.uber.com/*",
+                                                "*://web.lalamove.com/*",
+                                                "*://entrega.99app.com/*",
+                                                "*://mapa.james.delivery/map*"
+                                            ],
+                                "css":  [
+                                            "styles/nexos-design-system.css",
+                                            "core/picking-overlay-styles.css"
+                                        ],
+                                "js":  [
+                                           "core/auth/token-interceptor.js",
+                                           "core/auth/token-storage-scanner.js",
+                                           "msal-browser.min.js",
+                                           "config/azure-ad-config.js",
+                                           "config/sharepoint-config.js",
+                                           "core/auth/msal-auth.js",
+                                           "core/auth/unified-auth-service.js",
+                                           "core/auth/unified-auth-manager.js",
+                                           "tests/token-vault-manager.js",
+                                           "core/auth/auth-token-service-v2.js",
+                                           "core/auth/token-manager.js",
+                                           "core/auth/oauth-client.js",
+                                           "core/auth/auth-helper.js",
+                                           "core/auth/auto-login-handler.js",
+                                           "core/auth/token-sync-diagnostic.js",
+                                           "core/sharepoint/graph-client.js",
+                                           "core/sharepoint/graph-client-init.js",
+                                           "core/sharepoint/picking-sharepoint-manager.js",
+                                           "core/picking-timeline-sharepoint.js",
+                                           "core/picking-queue-sharepoint.js",
+                                           "core/smart-search.js",
+                                           "core/nexos-ui-components.js",
+                                           "core/nexos-auth-system.js",
+                                           "core/nexos-user-manager.js",
+                                           "core/nexos-overlay-template.js",
+                                           "core/nexos-ai-assistant.js",
+                                           "core/picking-state-manager.js",
+                                           "core/picking-lock-manager.js",
+                                           "core/picking-timeline-manager.js",
+                                           "core/picking-queue-manager.js",
+                                           "core/picking-platform-manager.js",
+                                           "core/picking-context-detector.js",
+                                           "core/picking-init.js",
+                                           "core/picking-overlay-v3.js",
+                                           "content.js",
+                                           "sheets-logger.js",
+                                           "content-99app.js"
+                                       ],
+                                "run_at":  "document_idle"
+                            },
+                            {
+                                "matches":  [
+                                                "*://picking-admin.backoffice.gpa.digital/*"
+                                            ],
+                                "js":  [
+                                           "core/auth/picking-admin-token-interceptor.js"
+                                       ],
+                                "run_at":  "document_start",
+                                "world":  "MAIN"
+                            },
+                            {
+                                "matches":  [
+                                                "*://control.instaleap.io/metrics*",
+                                                "*://control.instaleap.io/orders*"
+                                            ],
+                                "js":  [
+                                           "inject-instaleap-order-filter.js"
+                                       ],
+                                "run_at":  "document_idle",
+                                "world":  "MAIN"
+                            },
+                            {
+                                "matches":  [
+                                                "*://mapa.james.delivery/map*"
+                                            ],
+                                "js":  [
+                                           "core/expose-picking-overlay.js"
+                                       ],
+                                "run_at":  "document_end",
+                                "world":  "MAIN"
+                            },
+                            {
+                                "matches":  [
+                                                "\u003call_urls\u003e"
+                                            ],
+                                "js":  [
+                                           "core/admin_access_control.js",
+                                           "core/admin_panel_launcher.js"
+                                       ],
+                                "run_at":  "document_end",
+                                "all_frames":  false
+                            }
+                        ]
 }
-
-
-
-
