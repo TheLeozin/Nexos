@@ -47,9 +47,9 @@ param(
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
-# ─────────────────────────────────────────────────────────────────────────────
+# -----------------------------------------------------------------------------
 # CONFIGURAÇÃO
-# ─────────────────────────────────────────────────────────────────────────────
+# -----------------------------------------------------------------------------
 $EXTENSION_DIR  = Join-Path $InstallPath 'extension'
 $TEMP_DIR       = Join-Path $InstallPath 'temp'
 $BACKUP_DIR     = Join-Path $InstallPath 'backup'
@@ -63,9 +63,9 @@ $LOCK_TIMEOUT_S = 600        # Abandona update.lock após 10 min sem atividade
 $DOWNLOAD_TIMEOUT_S = 120    # Timeout por tentativa de download (segundos)
 $MAX_RETRIES    = 3          # Tentativas de download antes de desistir
 
-# ─────────────────────────────────────────────────────────────────────────────
+# -----------------------------------------------------------------------------
 # LOGGING COM ROTAÇÃO
-# ─────────────────────────────────────────────────────────────────────────────
+# -----------------------------------------------------------------------------
 function Write-Log {
     param([string]$Level, [string]$Message)
 
@@ -94,9 +94,9 @@ function Write-Warn  { param([string]$m) Write-Log 'WARN ' $m }
 function Write-Err   { param([string]$m) Write-Log 'ERROR' $m }
 function Write-Ok    { param([string]$m) Write-Log 'OK   ' $m }
 
-# ─────────────────────────────────────────────────────────────────────────────
+# -----------------------------------------------------------------------------
 # UPDATE.LOCK — evita execuções simultâneas (múltiplos processos/usuários)
-# ─────────────────────────────────────────────────────────────────────────────
+# -----------------------------------------------------------------------------
 function Invoke-AcquireLock {
     if (Test-Path $UPDATE_LOCK) {
         try {
@@ -130,9 +130,9 @@ function Invoke-ReleaseLock {
     }
 }
 
-# ─────────────────────────────────────────────────────────────────────────────
+# -----------------------------------------------------------------------------
 # VERSION.LOCK — rastreia versão instalada
-# ─────────────────────────────────────────────────────────────────────────────
+# -----------------------------------------------------------------------------
 function Read-VersionLock {
     if (-not (Test-Path $VERSION_LOCK)) {
         return [ordered]@{ installed = '0.0.0'; lastCheck = $null; isUpdating = $false; previous = $null; lastUpdated = $null }
@@ -156,9 +156,9 @@ function Write-VersionLock {
     $Data | ConvertTo-Json -Depth 5 | Set-Content $VERSION_LOCK -Encoding UTF8
 }
 
-# ─────────────────────────────────────────────────────────────────────────────
+# -----------------------------------------------------------------------------
 # COMPARAÇÃO SEMVER — retorna -1, 0 ou 1
-# ─────────────────────────────────────────────────────────────────────────────
+# -----------------------------------------------------------------------------
 function Compare-Versions {
     param([string]$v1, [string]$v2)
 
@@ -175,9 +175,9 @@ function Compare-Versions {
     return 0
 }
 
-# ─────────────────────────────────────────────────────────────────────────────
+# -----------------------------------------------------------------------------
 # DOWNLOAD COM RETRY E TIMEOUT
-# ─────────────────────────────────────────────────────────────────────────────
+# -----------------------------------------------------------------------------
 function Invoke-SafeDownload {
     param(
         [string]$Url,
@@ -186,7 +186,7 @@ function Invoke-SafeDownload {
 
     for ($attempt = 1; $attempt -le $MAX_RETRIES; $attempt++) {
         try {
-            Write-Info "Download tentativa $attempt/$MAX_RETRIES: $Url"
+            Write-Info "Download tentativa $attempt/${MAX_RETRIES}: $Url"
 
             $wc = New-Object System.Net.WebClient
             $wc.Headers.Add('User-Agent', 'NexosUpdater/1.0')
@@ -225,9 +225,9 @@ function Invoke-SafeDownload {
     return $false
 }
 
-# ─────────────────────────────────────────────────────────────────────────────
+# -----------------------------------------------------------------------------
 # VALIDAÇÃO DO CONTEÚDO EXTRAÍDO
-# ─────────────────────────────────────────────────────────────────────────────
+# -----------------------------------------------------------------------------
 function Test-ExtractedExtension {
     param(
         [string]$ExtractedPath,
@@ -254,9 +254,9 @@ function Test-ExtractedExtension {
     }
 }
 
-# ─────────────────────────────────────────────────────────────────────────────
+# -----------------------------------------------------------------------------
 # BACKUP (mantém $MAX_BACKUPS versões recentes)
-# ─────────────────────────────────────────────────────────────────────────────
+# -----------------------------------------------------------------------------
 function New-Backup {
     param([string]$CurrentVersion)
 
@@ -273,9 +273,9 @@ function New-Backup {
         Copy-Item -Path (Join-Path $EXTENSION_DIR '*') -Destination $backupTarget -Recurse -Force
         Write-Ok "Backup criado: $backupTarget"
 
-        # Limpar backups antigos
-        $allBackups = Get-ChildItem $BACKUP_DIR -Directory -ErrorAction SilentlyContinue |
-                      Sort-Object LastWriteTime
+        # Limpar backups antigos (@() garante array mesmo com 0 ou 1 item)
+        $allBackups = @(Get-ChildItem $BACKUP_DIR -Directory -ErrorAction SilentlyContinue |
+                      Sort-Object LastWriteTime)
         if ($allBackups.Count -gt $MAX_BACKUPS) {
             $toRemove = $allBackups | Select-Object -First ($allBackups.Count - $MAX_BACKUPS)
             foreach ($old in $toRemove) {
@@ -290,9 +290,9 @@ function New-Backup {
     }
 }
 
-# ─────────────────────────────────────────────────────────────────────────────
+# -----------------------------------------------------------------------------
 # ROLLBACK — restaura versão anterior a partir do backup
-# ─────────────────────────────────────────────────────────────────────────────
+# -----------------------------------------------------------------------------
 function Invoke-Rollback {
     param([string]$VersionToRestore)
 
@@ -315,9 +315,9 @@ function Invoke-Rollback {
     }
 }
 
-# ─────────────────────────────────────────────────────────────────────────────
+# -----------------------------------------------------------------------------
 # SUBSTITUIÇÃO ATÔMICA DE ARQUIVOS (staging → rename)
-# ─────────────────────────────────────────────────────────────────────────────
+# -----------------------------------------------------------------------------
 function Install-ExtensionFiles {
     param([string]$SourcePath)
 
@@ -361,25 +361,26 @@ function Install-ExtensionFiles {
     }
 }
 
-# ─────────────────────────────────────────────────────────────────────────────
+# -----------------------------------------------------------------------------
 # FLUXO PRINCIPAL
-# ─────────────────────────────────────────────────────────────────────────────
+# -----------------------------------------------------------------------------
 function Invoke-UpdateCheck {
     $versionLock     = Read-VersionLock
     $currentVersion  = $versionLock.installed
 
-    Write-Info '═══════════════════════════════════════════════'
+    Write-Info '-----------------------------------------------'
     Write-Info "Nexos Updater iniciado — instalada: v$currentVersion"
     if ($DryRun) { Write-Info '[DRY RUN] Nenhum arquivo será modificado.' }
 
-    # ── 1. Buscar latest.json ─────────────────────────────────────────────
+    # -- 1. Buscar latest.json ---------------------------------------------
     $latestJson = $null
     try {
         $resp = Invoke-WebRequest -Uri $LatestJsonUrl `
                     -UseBasicParsing `
                     -TimeoutSec 30 `
                     -Headers @{ 'Cache-Control' = 'no-cache'; 'User-Agent' = 'NexosUpdater/1.0' }
-        $latestJson = $resp.Content | ConvertFrom-Json
+        # Remover BOM (U+FEFF) que GitHub pode adicionar ao servir arquivos UTF-8-BOM
+        $latestJson = $resp.Content.TrimStart([char]0xFEFF) | ConvertFrom-Json
     } catch {
         Write-Warn "Não foi possível buscar latest.json: $($_.Exception.Message)"
         return
@@ -399,7 +400,7 @@ function Invoke-UpdateCheck {
         if (-not $DryRun) { Write-VersionLock $versionLock }
     } catch {}
 
-    # ── 2. Comparar versões ───────────────────────────────────────────────
+    # -- 2. Comparar versões -----------------------------------------------
     $cmp = Compare-Versions $remoteVersion $currentVersion
     if ($cmp -le 0 -and -not $Force) {
         Write-Info "Já está na versão mais recente (v$currentVersion). Nenhuma ação."
@@ -413,7 +414,7 @@ function Invoke-UpdateCheck {
         return
     }
 
-    # ── 3. Adquirir lock ──────────────────────────────────────────────────
+    # -- 3. Adquirir lock --------------------------------------------------
     if (-not (Invoke-AcquireLock)) { return }
 
     $zipFile    = Join-Path $TEMP_DIR "nexos-$remoteVersion.zip"
@@ -421,28 +422,28 @@ function Invoke-UpdateCheck {
     $success    = $false
 
     try {
-        # ── 4. Marcar como atualizando ────────────────────────────────────
+        # -- 4. Marcar como atualizando ------------------------------------
         $versionLock.isUpdating = $true
         Write-VersionLock $versionLock
 
-        # ── 5. Garantir diretórios ────────────────────────────────────────
+        # -- 5. Garantir diretórios ----------------------------------------
         foreach ($dir in @($TEMP_DIR, $BACKUP_DIR, $LOGS_DIR)) {
             if (-not (Test-Path $dir)) {
                 New-Item -ItemType Directory -Path $dir -Force | Out-Null
             }
         }
 
-        # ── 6. Limpar temp anterior ───────────────────────────────────────
+        # -- 6. Limpar temp anterior ---------------------------------------
         if (Test-Path $zipFile)    { Remove-Item $zipFile    -Force }
         if (Test-Path $extractDir) { Remove-Item $extractDir -Recurse -Force }
 
-        # ── 7. Download ───────────────────────────────────────────────────
+        # -- 7. Download ---------------------------------------------------
         if (-not (Invoke-SafeDownload -Url $zipUrl -Destination $zipFile)) {
             Write-Err "Download falhou após $MAX_RETRIES tentativas. Abortando."
             return
         }
 
-        # ── 8. Extrair ZIP ────────────────────────────────────────────────
+        # -- 8. Extrair ZIP ------------------------------------------------
         Write-Info "Extraindo ZIP..."
         try {
             Expand-Archive -Path $zipFile -DestinationPath $extractDir -Force
@@ -459,18 +460,18 @@ function Invoke-UpdateCheck {
             Write-Info "Subpasta detectada: $($items[0].Name)"
         }
 
-        # ── 9. Validar conteúdo ───────────────────────────────────────────
+        # -- 9. Validar conteúdo -------------------------------------------
         if (-not (Test-ExtractedExtension -ExtractedPath $extensionRoot -ExpectedVersion $remoteVersion)) {
             Write-Err "Validação falhou. Atualização abortada para proteção."
             return
         }
 
-        # ── 10. Backup da versão atual ────────────────────────────────────
+        # -- 10. Backup da versão atual ------------------------------------
         if (-not (New-Backup -CurrentVersion $currentVersion)) {
             Write-Warn "Backup falhou. Continuando (rollback manual possível em: $BACKUP_DIR)."
         }
 
-        # ── 11. Substituir arquivos ───────────────────────────────────────
+        # -- 11. Substituir arquivos ---------------------------------------
         Write-Info "Instalando v$remoteVersion..."
         if (-not (Install-ExtensionFiles -SourcePath $extensionRoot)) {
             Write-Err "Instalação falhou. Tentando rollback para v$currentVersion..."
@@ -478,7 +479,7 @@ function Invoke-UpdateCheck {
             return
         }
 
-        # ── 12. Atualizar version.lock ────────────────────────────────────
+        # -- 12. Atualizar version.lock ------------------------------------
         $newLock = [ordered]@{
             installed   = $remoteVersion
             previous    = $currentVersion
@@ -489,13 +490,13 @@ function Invoke-UpdateCheck {
         Write-VersionLock $newLock
 
         $success = $true
-        Write-Ok '═══════════════════════════════════════════════'
+        Write-Ok '-----------------------------------------------'
         Write-Ok "Atualização concluída: v$currentVersion → v$remoteVersion"
         Write-Ok "background.js detectará a nova versão e recarregará a extensão."
-        Write-Ok '═══════════════════════════════════════════════'
+        Write-Ok '-----------------------------------------------'
 
     } finally {
-        # ── Limpeza de temp ───────────────────────────────────────────────
+        # -- Limpeza de temp -----------------------------------------------
         try {
             if (Test-Path $zipFile)    { Remove-Item $zipFile    -Force -ErrorAction SilentlyContinue }
             if (Test-Path $extractDir) { Remove-Item $extractDir -Recurse -Force -ErrorAction SilentlyContinue }
@@ -514,9 +515,9 @@ function Invoke-UpdateCheck {
     }
 }
 
-# ─────────────────────────────────────────────────────────────────────────────
+# -----------------------------------------------------------------------------
 # ENTRY POINT
-# ─────────────────────────────────────────────────────────────────────────────
+# -----------------------------------------------------------------------------
 Write-Info "Nexos Updater v1.0.0 — PID: $PID — $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')"
 
 try {

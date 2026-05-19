@@ -1,4 +1,4 @@
-﻿#Requires -Version 5.1
+#Requires -Version 5.1
 <#
 .SYNOPSIS
     Instala o Nexos Updater SEM privilégios de administrador.
@@ -24,18 +24,29 @@ param(
 
 $ErrorActionPreference = 'Stop'
 
-# ─────────────────────────────────────────────────────────────────────────────
+function Get-PowerShellExecutable {
+    $powerShell = Get-Command powershell.exe -ErrorAction SilentlyContinue
+    if ($powerShell) { return $powerShell.Source }
+
+    $pwsh = Get-Command pwsh.exe -ErrorAction SilentlyContinue
+    if ($pwsh) { return $pwsh.Source }
+
+    throw 'Nenhum executável do PowerShell foi encontrado (powershell.exe/pwsh.exe).'
+}
+
+# -----------------------------------------------------------------------------
 # CONFIGURAÇÃO
-# ─────────────────────────────────────────────────────────────────────────────
+# -----------------------------------------------------------------------------
 $TASK_NAME      = 'NexosUpdater'
 $UPDATER_SCRIPT = Join-Path $InstallPath 'updater\nexos-updater.ps1'
 $LAUNCHER_BAT   = Join-Path $InstallPath 'updater\nexos-run.bat'
 $LOGS_DIR       = Join-Path $InstallPath 'logs'
 $INTERVAL_MIN   = 5
+$PS_EXE         = Get-PowerShellExecutable
 
-# ─────────────────────────────────────────────────────────────────────────────
+# -----------------------------------------------------------------------------
 # GARANTIR PASTAS
-# ─────────────────────────────────────────────────────────────────────────────
+# -----------------------------------------------------------------------------
 foreach ($dir in @($InstallPath, (Split-Path $UPDATER_SCRIPT), $LOGS_DIR)) {
     if (-not (Test-Path $dir)) {
         New-Item -ItemType Directory -Path $dir -Force | Out-Null
@@ -43,11 +54,16 @@ foreach ($dir in @($InstallPath, (Split-Path $UPDATER_SCRIPT), $LOGS_DIR)) {
     }
 }
 
-# ─────────────────────────────────────────────────────────────────────────────
+# -----------------------------------------------------------------------------
 # COPIAR SCRIPT DO UPDATER (se executando do source)
-# ─────────────────────────────────────────────────────────────────────────────
+# -----------------------------------------------------------------------------
 $sourceScript = Join-Path $PSScriptRoot 'nexos-updater.ps1'
-if ((Test-Path $sourceScript) -and ((Get-Item $sourceScript).FullName -ne (Resolve-Path $UPDATER_SCRIPT -ErrorAction SilentlyContinue)?.Path)) {
+$resolvedUpdaterPath = $null
+if (Test-Path $UPDATER_SCRIPT) {
+    try { $resolvedUpdaterPath = (Resolve-Path $UPDATER_SCRIPT).Path } catch {}
+}
+
+if ((Test-Path $sourceScript) -and ((Get-Item $sourceScript).FullName -ne $resolvedUpdaterPath)) {
     Copy-Item $sourceScript $UPDATER_SCRIPT -Force
     Write-Host "Script copiado: $UPDATER_SCRIPT"
 } elseif (-not (Test-Path $UPDATER_SCRIPT)) {
@@ -55,38 +71,50 @@ if ((Test-Path $sourceScript) -and ((Get-Item $sourceScript).FullName -ne (Resol
     Write-Warning "Copie o arquivo manualmente antes de executar a tarefa."
 }
 
-# ─────────────────────────────────────────────────────────────────────────────
+# -----------------------------------------------------------------------------
 # CRIAR LAUNCHER .BAT (evita problemas com aspas/espaços no schtasks.exe)
-# ─────────────────────────────────────────────────────────────────────────────
+# -----------------------------------------------------------------------------
 $batContent = @"
 @echo off
-powershell.exe -NonInteractive -NoProfile -WindowStyle Hidden -ExecutionPolicy Bypass -File "%~dp0nexos-updater.ps1" -InstallPath "$InstallPath"
+"$PS_EXE" -NonInteractive -NoProfile -WindowStyle Hidden -ExecutionPolicy Bypass -File "%~dp0nexos-updater.ps1" -InstallPath "$InstallPath"
 "@
 Set-Content -Path $LAUNCHER_BAT -Value $batContent -Encoding ASCII
 Write-Host "Launcher criado: $LAUNCHER_BAT"
 
-# ─────────────────────────────────────────────────────────────────────────────
+# -----------------------------------------------------------------------------
 # REMOVER TAREFA ANTERIOR (se existir)
-# ─────────────────────────────────────────────────────────────────────────────
-$existingTask = & schtasks /query /tn $TASK_NAME 2>&1
-if ($LASTEXITCODE -eq 0) {
+# -----------------------------------------------------------------------------
+# $ErrorActionPreference = 'SilentlyContinue' evita NativeCommandError no PS5.1
+# quando schtasks escreve no stderr (ex: tarefa não encontrada → exit code 1).
+$_prevPref = $ErrorActionPreference
+$ErrorActionPreference = 'SilentlyContinue'
+& schtasks /query /tn $TASK_NAME 2>$null | Out-Null
+$_queryExit = $LASTEXITCODE
+$ErrorActionPreference = $_prevPref
+if ($_queryExit -eq 0) {
     Write-Host "Removendo tarefa existente '$TASK_NAME'..."
-    & schtasks /delete /tn $TASK_NAME /f 2>&1 | Out-Null
+    $ErrorActionPreference = 'SilentlyContinue'
+    & schtasks /delete /tn $TASK_NAME /f 2>$null | Out-Null
+    $ErrorActionPreference = $_prevPref
 }
 
-# ─────────────────────────────────────────────────────────────────────────────
+# -----------------------------------------------------------------------------
 # CRIAR TAREFA AGENDADA (schtasks.exe — sem admin, usuário atual)
-# ─────────────────────────────────────────────────────────────────────────────
+# -----------------------------------------------------------------------------
 # /sc MINUTE /mo 5  → executa a cada 5 minutos
 # /f                → sobrescreve se existir
 # Sem /ru → usa o usuário atual (não pede senha)
+$ErrorActionPreference = 'SilentlyContinue'
 & schtasks /create `
     /tn $TASK_NAME `
     /tr "`"$LAUNCHER_BAT`"" `
     /sc MINUTE /mo $INTERVAL_MIN `
-    /f 2>&1 | Out-Null
+    /rl LIMITED `
+    /f 2>$null | Out-Null
+$_createExit = $LASTEXITCODE
+$ErrorActionPreference = $_prevPref
 
-if ($LASTEXITCODE -ne 0) {
+if ($_createExit -ne 0) {
     Write-Warning "schtasks falhou (código $LASTEXITCODE). Tentando via Register-ScheduledTask..."
 
     # Fallback: Register-ScheduledTask (sem admin para tarefas do próprio usuário)
@@ -122,34 +150,28 @@ if ($LASTEXITCODE -ne 0) {
     Write-Host "✅ Tarefa '$TASK_NAME' registrada (a cada ${INTERVAL_MIN} min)."
 }
 
-# ─────────────────────────────────────────────────────────────────────────────
+# -----------------------------------------------------------------------------
 # HKCU\Run — executa no login do usuário (persistência adicional)
-# ─────────────────────────────────────────────────────────────────────────────
+# -----------------------------------------------------------------------------
 $runKey = 'HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Run'
 Set-ItemProperty -Path $runKey -Name $TASK_NAME -Value "`"$LAUNCHER_BAT`"" -Force
 Write-Host "✅ HKCU\Run configurado (executa no próximo login)."
 
-# ─────────────────────────────────────────────────────────────────────────────
+# -----------------------------------------------------------------------------
 # SUMÁRIO
-# ─────────────────────────────────────────────────────────────────────────────
-Write-Host ""
-Write-Host "═══════════════════════════════════════════════════"
-Write-Host " Nexos Updater instalado com sucesso (sem admin)"
-Write-Host "═══════════════════════════════════════════════════"
+# -----------------------------------------------------------------------------
+Write-Host ''
+Write-Host '---------------------------------------------------'
+Write-Host ' Nexos Updater instalado com sucesso (sem admin)'
+Write-Host '---------------------------------------------------'
 Write-Host "  Instalação : $InstallPath"
 Write-Host "  Script     : $UPDATER_SCRIPT"
 Write-Host "  Launcher   : $LAUNCHER_BAT"
+Write-Host "  PowerShell : $PS_EXE"
 Write-Host "  Logs       : $LOGS_DIR\updater.log"
 Write-Host "  Intervalo  : a cada $INTERVAL_MIN minutos"
-Write-Host ""
-Write-Host "Para testar manualmente:"
+Write-Host ''
+Write-Host 'Para testar manualmente:'
 Write-Host "  powershell -File `"$UPDATER_SCRIPT`" -DryRun"
-Write-Host ""
+Write-Host ''
 
-# Executar agora se desejado
-$response = Read-Host "Executar o updater agora? [S/n]"
-if ($response -ne 'n' -and $response -ne 'N') {
-    Write-Host "Iniciando updater em background..."
-    Start-Process cmd.exe -ArgumentList "/c `"$LAUNCHER_BAT`"" -WindowStyle Hidden
-    Write-Host "✅ Iniciado. Aguarde alguns segundos e verifique: $LOGS_DIR\updater.log"
-}

@@ -1,4 +1,10 @@
 ﻿{
+    "3.0.3":  [
+                  "fix: schtasks GPO, URI scheme nexos-update://, instalador com tela de confirmação e remoção completa"
+              ],
+    "3.0.2":  [
+                  "fix: manifest sem tests/; installer redesign; bootstrap janela oculta"
+              ],
     "3.0.1":  [
                   "fix: campo complemento no autofill Uber (4 fallbacks)",
                   "fix: loop infinito waitForUrlUber eliminado (timeout 2min)",

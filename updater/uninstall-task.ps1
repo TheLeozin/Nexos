@@ -1,4 +1,4 @@
-﻿#Requires -Version 5.1
+#Requires -Version 5.1
 <#
 .SYNOPSIS
     Remove o Nexos Updater SEM precisar de administrador.
@@ -22,10 +22,16 @@ $TASK_NAME = 'NexosUpdater'
 # ─────────────────────────────────────────────────────────────────────────────
 # REMOVER TAREFA AGENDADA
 # ─────────────────────────────────────────────────────────────────────────────
-$existingTask = & schtasks /query /tn $TASK_NAME 2>&1
-if ($LASTEXITCODE -eq 0) {
-    & schtasks /end /tn $TASK_NAME 2>&1 | Out-Null
-    & schtasks /delete /tn $TASK_NAME /f 2>&1 | Out-Null
+$_prevPref = $ErrorActionPreference
+$ErrorActionPreference = 'SilentlyContinue'
+& schtasks /query /tn $TASK_NAME 2>$null | Out-Null
+$_queryExit = $LASTEXITCODE
+$ErrorActionPreference = $_prevPref
+if ($_queryExit -eq 0) {
+    $ErrorActionPreference = 'SilentlyContinue'
+    & schtasks /end /tn $TASK_NAME 2>$null | Out-Null
+    & schtasks /delete /tn $TASK_NAME /f 2>$null | Out-Null
+    $ErrorActionPreference = $_prevPref
     Write-Host "Tarefa '$TASK_NAME' removida do Task Scheduler."
 } else {
     # Tentar também via Register-ScheduledTask (pode ter sido criada por este método)
@@ -72,8 +78,12 @@ if ($RemoveFiles) {
             Write-Host "Pasta removida: $dir"
         }
     }
-    Write-Host ""
-    Write-Host "Os arquivos da extensão (extension\) e backups (backup\) foram preservados."
+}
+
+# Remover pasta raiz completa
+if (Test-Path $InstallPath) {
+    Remove-Item $InstallPath -Recurse -Force -ErrorAction SilentlyContinue
+    Write-Host "Pasta raiz removida: $InstallPath"
 }
 
 Write-Host ""

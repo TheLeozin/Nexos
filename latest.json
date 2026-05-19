@@ -1,14 +1,10 @@
 ﻿{
-    "version": "3.0.2",
-    "url": "https://raw.githubusercontent.com/TheLeozin/Nexos/main/dist/nexos-3.0.2.zip",
-    "hash": "sha256:574038e4be26f06bb00d7e69a88148bfcc5611ed243165966b7a707b4497db89",
-    "releaseDate":  "2026-05-15T09:03:58Z",
+    "version":  "3.0.3",
+    "url":  "https://github.com/TheLeozin/Nexos/releases/download/v3.0.3/nexos-3.0.3.zip",
+    "hash":  "sha256:a7c77493391d02c3aea6b3f14fd4e3997a003c7e99796ea3186f7d95b532648f",
+    "releaseDate":  "2026-05-19T11:20:32Z",
     "minUpdater":  "1.0.0",
     "notes":  [
-                  "fix: campo complemento no autofill Uber (4 fallbacks)",
-                  "fix: loop infinito waitForUrlUber eliminado (timeout 2min)",
-                  "feat: tracking ID Uber com retry 30s + monitor async 5min",
-                  "feat: bootstrap.ps1 - instalador 1-linha sem admin",
-                  "feat: release.ps1 - pipeline de deploy automatizado"
+                  "fix: schtasks GPO, URI scheme nexos-update://, instalador com tela de confirmação e remoção completa"
               ]
 }

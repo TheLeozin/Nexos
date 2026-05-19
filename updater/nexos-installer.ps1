@@ -1,7 +1,7 @@
-﻿#Requires -Version 5.1
+#Requires -Version 5.1
 <#
 .SYNOPSIS
-    Nexos Torre - Instalador Visual v2
+    Nexos - Instalador Visual v2
     Design profissional: sidebar escura + area de conteudo clara.
     Executar sempre em modo STA:
         powershell.exe -sta -noprofile -executionpolicy bypass -file nexos-installer.ps1
@@ -11,9 +11,35 @@ param(
     [switch]$Force
 )
 
+function Get-PowerShellExecutable {
+    $powerShell = Get-Command powershell.exe -ErrorAction SilentlyContinue
+    if ($powerShell) { return $powerShell.Source }
+
+    $pwsh = Get-Command pwsh.exe -ErrorAction SilentlyContinue
+    if ($pwsh) { return $pwsh.Source }
+
+    throw 'Nenhum executável do PowerShell foi encontrado (powershell.exe/pwsh.exe).'
+}
+
+# Força TLS moderno em ambientes corporativos/restritos
+try {
+    [Net.ServicePointManager]::SecurityProtocol = [Net.ServicePointManager]::SecurityProtocol -bor [Net.SecurityProtocolType]::Tls12
+} catch {}
+
+$PS_EXE = Get-PowerShellExecutable
+
 Add-Type -AssemblyName System.Windows.Forms
 Add-Type -AssemblyName System.Drawing
 [System.Windows.Forms.Application]::EnableVisualStyles()
+
+# Ocultar a janela do console (o WinForms abre sua propria janela)
+try {
+    Add-Type -Name NativeConsole -Namespace Win32 -MemberDefinition '
+        [DllImport("kernel32.dll")] public static extern IntPtr GetConsoleWindow();
+        [DllImport("user32.dll")]   public static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
+    ' -ErrorAction SilentlyContinue
+    [Win32.NativeConsole]::ShowWindow([Win32.NativeConsole]::GetConsoleWindow(), 0) | Out-Null
+} catch {}
 
 # --- URLs ------------------------------------------------------------------
 $RAW       = 'https://raw.githubusercontent.com/TheLeozin/Nexos/main'
@@ -52,7 +78,7 @@ $C_LOGBG   = rgb 238 243 252    # fundo log
 #  FORM PRINCIPAL  560 x 620
 # ============================================================
 $F = New-Object System.Windows.Forms.Form
-$F.Text            = 'Nexos Torre - Instalador'
+$F.Text            = 'Nexos - Instalador'
 $F.ClientSize      = New-Object System.Drawing.Size(620, 620)
 $F.MinimumSize     = $F.Size
 $F.MaximumSize     = $F.Size
@@ -170,7 +196,7 @@ $W = 440   # largura da area principal
 
 # Titulo topo
 $LBL_TITLE = New-Object System.Windows.Forms.Label
-$LBL_TITLE.Text      = 'Instalacao do Nexos Torre'
+$LBL_TITLE.Text      = 'Instalacao do Nexos'
 $LBL_TITLE.Location  = New-Object System.Drawing.Point(196, 26)
 $LBL_TITLE.Size      = New-Object System.Drawing.Size(400, 34)
 $LBL_TITLE.ForeColor = $C_TEXT
@@ -310,17 +336,19 @@ function Update-Subtitle([string]$msg) {
 }
 
 function Load-Logo {
+    # Usa MemoryStream para nao travar o arquivo em disco (file handle liberado imediatamente)
     $localLogo = Join-Path $EXT_DIR 'images\logo_nome.png'
     try {
         if (Test-Path $localLogo) {
-            $PIC.Image    = [System.Drawing.Image]::FromFile($localLogo)
-            $PIC.BackColor = $C_SIDE
+            $bytes = [System.IO.File]::ReadAllBytes($localLogo)
         } else {
-            $tmp = "$env:TEMP\_nexos_logo_$PID.png"
-            (New-Object System.Net.WebClient).DownloadFile($LOGO_URL, $tmp)
-            $PIC.Image    = [System.Drawing.Image]::FromFile($tmp)
-            $PIC.BackColor = $C_SIDE
+            $wc = New-Object System.Net.WebClient
+            $bytes = $wc.DownloadData($LOGO_URL)
+            $wc.Dispose()
         }
+        $ms = New-Object System.IO.MemoryStream(,$bytes)
+        $PIC.Image     = [System.Drawing.Image]::FromStream($ms)
+        $PIC.BackColor = $C_SIDE
     } catch {}
     DoUI
 }
@@ -408,7 +436,7 @@ function Start-Install {
         $zipFile = Join-Path $tempDir "nexos-$ver.zip"
 
         Add-Log "Baixando $zipUrl..."
-        Update-Subtitle "Baixando Nexos Torre v$ver..."
+        Update-Subtitle "Baixando Nexos v$ver..."
         Set-Progress 30
         DoUI
 
@@ -473,7 +501,7 @@ function Start-Install {
     if (Test-Path $TASK_FILE) {
         try {
             Add-Log "Criando tarefa NexosUpdater..."
-            $p = Start-Process 'powershell.exe' -ArgumentList "-noprofile -executionpolicy bypass -file `"$TASK_FILE`" -InstallPath `"$InstallPath`"" -Wait -PassThru -WindowStyle Hidden
+            $p = Start-Process $PS_EXE -ArgumentList "-noprofile -executionpolicy bypass -file `"$TASK_FILE`" -InstallPath `"$InstallPath`"" -Wait -PassThru -WindowStyle Hidden
             $taskOk = ($p.ExitCode -eq 0)
             if ($taskOk) { Add-Log "  Tarefa criada" } else { Add-Log "  Aviso: cod $($p.ExitCode)" }
         } catch { Add-Log "  Aviso: $($_.Exception.Message)" }
@@ -488,7 +516,7 @@ function Start-Install {
 
     Load-Logo
     Set-Progress 100
-    Update-Subtitle "Nexos Torre v$verFinal instalado com sucesso!"
+    Update-Subtitle "Nexos v$verFinal instalado com sucesso!"
     Set-Status "Instalacao concluida!" $C_GREEN
 
     Add-Log ""
@@ -528,7 +556,7 @@ function Start-Install {
         }
         if (-not $launched) {
             $msg = "Abra o Chrome/Edge e acesse:`n  chrome://extensions`n`nDepois:`n  1. Ative Modo do desenvolvedor`n  2. Carregar sem compactacao`n  3. Selecione (Ctrl+V):`n     $capturedDir"
-            [System.Windows.Forms.MessageBox]::Show($msg, 'Nexos Torre - Passo Final', 'OK', 'Information') | Out-Null
+            [System.Windows.Forms.MessageBox]::Show($msg, 'Nexos - Passo Final', 'OK', 'Information') | Out-Null
         }
     }.GetNewClosure())
 }
@@ -540,7 +568,7 @@ function Show-AlreadyInstalled([string]$ver) {
     for ($i = 0; $i -lt $SC.Count; $i++) { Set-Step $i 'done' }
     Load-Logo
     Set-Progress 100
-    Update-Subtitle "Nexos Torre v$ver ja esta instalado."
+    Update-Subtitle "Nexos v$ver ja esta instalado."
     Set-Status "Instalacao detectada: v$ver" $C_GREEN
     Add-Log "Instalacao existente: v$ver"
     Add-Log "Caminho: $EXT_DIR"
