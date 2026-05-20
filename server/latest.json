@@ -1,13 +1,13 @@
 ﻿{
   "version": "3.0.3",
   "url": "https://github.com/TheLeozin/Nexos/releases/download/v3.0.3/nexos-3.0.3.zip",
-  "hash": "sha256:b55105a2024d8495ab98579be801fb9226dfa34d89d0d29b1446d9d488d14c02",
-  "releaseDate": "2026-05-20T12:56:03Z",
+  "hash": "sha256:205e8bfdb470feb56f43d8d9158e859d7f659b6196ba2fbced4252e97a177273",
+  "releaseDate": "2026-05-20T14:00:00Z",
   "minUpdater": "1.0.0",
   "notes": [
     "feat: logo Nexos nos modais de update",
     "feat: aba do instalador recebe foco automaticamente",
-    "feat: instrucao 'Clique em Abrir nexos-run' apos disparar instalador",
+    "feat: instrucao Clique em Abrir nexos-run apos disparar instalador",
     "fix: modal descartavel em paginas regulares, bloqueante no monitor",
     "fix: update nao abre mais CMD a cada 5 minutos"
   ]
