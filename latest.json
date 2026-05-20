@@ -1,10 +1,13 @@
 ﻿{
     "version":  "3.0.3",
     "url":  "https://github.com/TheLeozin/Nexos/releases/download/v3.0.3/nexos-3.0.3.zip",
-    "hash":  "sha256:a7c77493391d02c3aea6b3f14fd4e3997a003c7e99796ea3186f7d95b532648f",
-    "releaseDate":  "2026-05-19T11:20:32Z",
+    "hash":  "sha256:5b6f2d98f2c28f59f558047933ee55dab7e833016d6071fe3431c2f189b45749",
+    "releaseDate":  "2026-05-20T08:38:26Z",
     "minUpdater":  "1.0.0",
     "notes":  [
-                  "fix: schtasks GPO, URI scheme nexos-update://, instalador com tela de confirmação e remoção completa"
+                  "fix: banner de update no monitor",
+                  "fix: post-update reconhecido apos reload do Service Worker",
+                  "fix: URI abre instalador com UI (modo update automatico)",
+                  "fix: InstaladorNexos.exe distribuido junto com a extensao"
               ]
 }

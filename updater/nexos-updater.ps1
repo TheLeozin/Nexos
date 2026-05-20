@@ -1,4 +1,4 @@
-#Requires -Version 5.1
+﻿#Requires -Version 5.1
 <#
 .SYNOPSIS
     Nexos Chrome Extension Auto-Updater v1.0.0
@@ -95,7 +95,7 @@ function Write-Err   { param([string]$m) Write-Log 'ERROR' $m }
 function Write-Ok    { param([string]$m) Write-Log 'OK   ' $m }
 
 # -----------------------------------------------------------------------------
-# UPDATE.LOCK — evita execuções simultâneas (múltiplos processos/usuários)
+# UPDATE.LOCK  -  evita execuções simultâneas (múltiplos processos/usuários)
 # -----------------------------------------------------------------------------
 function Invoke-AcquireLock {
     if (Test-Path $UPDATE_LOCK) {
@@ -103,7 +103,7 @@ function Invoke-AcquireLock {
             $lock    = Get-Content $UPDATE_LOCK -Raw | ConvertFrom-Json
             $lockAge = (Get-Date) - [datetime]$lock.timestamp
             if ($lockAge.TotalSeconds -lt $LOCK_TIMEOUT_S) {
-                Write-Warn "Lock ativo — PID $($lock.pid), $([math]::Round($lockAge.TotalMinutes, 1)) min. Saindo."
+                Write-Warn "Lock ativo  -  PID $($lock.pid), $([math]::Round($lockAge.TotalMinutes, 1)) min. Saindo."
                 return $false
             }
             Write-Warn "Lock expirado ($([math]::Round($lockAge.TotalMinutes, 1)) min). Limpando."
@@ -131,7 +131,7 @@ function Invoke-ReleaseLock {
 }
 
 # -----------------------------------------------------------------------------
-# VERSION.LOCK — rastreia versão instalada
+# VERSION.LOCK  -  rastreia versão instalada
 # -----------------------------------------------------------------------------
 function Read-VersionLock {
     if (-not (Test-Path $VERSION_LOCK)) {
@@ -146,7 +146,7 @@ function Read-VersionLock {
         }
         return $data
     } catch {
-        Write-Warn "version.lock corrompido — usando padrão."
+        Write-Warn "version.lock corrompido  -  usando padrão."
         return [ordered]@{ installed = '0.0.0'; lastCheck = $null; isUpdating = $false; previous = $null; lastUpdated = $null }
     }
 }
@@ -157,7 +157,7 @@ function Write-VersionLock {
 }
 
 # -----------------------------------------------------------------------------
-# COMPARAÇÃO SEMVER — retorna -1, 0 ou 1
+# COMPARAÇÃO SEMVER  -  retorna -1, 0 ou 1
 # -----------------------------------------------------------------------------
 function Compare-Versions {
     param([string]$v1, [string]$v2)
@@ -246,10 +246,10 @@ function Test-ExtractedExtension {
             Write-Warn "Validação: versão no manifest ($($manifest.version)) ≠ esperada ($ExpectedVersion)"
             return $false
         }
-        Write-Ok "Validação OK — manifest.json v$($manifest.version)"
+        Write-Ok "Validação OK  -  manifest.json v$($manifest.version)"
         return $true
     } catch {
-        Write-Warn "Validação: manifest.json inválido — $($_.Exception.Message)"
+        Write-Warn "Validação: manifest.json inválido  -  $($_.Exception.Message)"
         return $false
     }
 }
@@ -261,7 +261,7 @@ function New-Backup {
     param([string]$CurrentVersion)
 
     if (-not (Test-Path $EXTENSION_DIR)) {
-        Write-Info "Sem extensão instalada — backup ignorado."
+        Write-Info "Sem extensão instalada  -  backup ignorado."
         return $true
     }
 
@@ -291,7 +291,7 @@ function New-Backup {
 }
 
 # -----------------------------------------------------------------------------
-# ROLLBACK — restaura versão anterior a partir do backup
+# ROLLBACK  -  restaura versão anterior a partir do backup
 # -----------------------------------------------------------------------------
 function Invoke-Rollback {
     param([string]$VersionToRestore)
@@ -369,7 +369,7 @@ function Invoke-UpdateCheck {
     $currentVersion  = $versionLock.installed
 
     Write-Info '-----------------------------------------------'
-    Write-Info "Nexos Updater iniciado — instalada: v$currentVersion"
+    Write-Info "Nexos Updater iniciado  -  instalada: v$currentVersion"
     if ($DryRun) { Write-Info '[DRY RUN] Nenhum arquivo será modificado.' }
 
     # -- 1. Buscar latest.json ---------------------------------------------
@@ -518,7 +518,7 @@ function Invoke-UpdateCheck {
 # -----------------------------------------------------------------------------
 # ENTRY POINT
 # -----------------------------------------------------------------------------
-Write-Info "Nexos Updater v1.0.0 — PID: $PID — $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')"
+Write-Info "Nexos Updater v1.0.0  -  PID: $PID  -  $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')"
 
 try {
     Invoke-UpdateCheck

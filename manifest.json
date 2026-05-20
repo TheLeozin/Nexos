@@ -1,10 +1,10 @@
 ﻿{
     "manifest_version":  3,
     "key":  "MIIEvAIBADANBgkqhkiG9w0BAQEFAASCBKYwggSiAgEAAoIBAQCp98Gy7A+4SP7fVZUuA4bwGmnSW5cLHEviY9eYbTAy26XumzjhGuWqAXNw7uFEQRl6OfLqCriB/UAxrBGUyymd/R7nKYim/KdDIfJpwxLZWwfb42hg7HPer/m+GsE5uaU+1h4JvzalE1pI4INyCVvJ0ZhuVtGk1uoZZ0aH5IcCrxAF1QWtPvphHNNtZ3YuyZbFANE7CvOkmacp45MrTMyBzZKo7W/nDRub80z3kOwh9dDL/YBqX3w6qXRO/Dwr3843l8uCCDWfXWQXof8Vi4Znkx/wihiUtGAqh25YZFIN7kjW5ziqYkg/Yqv5gAXoR5jOk89iMDUwNA4oBrTyX43vAgMBAAECggEABeoVpuy49VAw8kOPn9zGjsdUhFnkjSHscBHKWEcAZNyozv8+wPKHKF3JjxX457+eK9clYUiDOB7AY5oZuIRDS/iZYTDcTPdAuMDPJyf/GWomAVxN7wV7WLXl6lwS+jfADMo1nGA3fhII071gRZEWzRSKidhijipeVgj2dtcYbZrsTE61vu65KQ+DbFsVANXLo3+1nH+xtSltEZdRfxa8ysN80hU2oPmsXZoksSV3HMH3xSR+zJvNZZBTeUWspFqBIZw2ENkzt3RKuKs99ZgrAS5r5OXV8jAi9hDhKEJF8aA0LL3VXELYU0UCeCHUUjG4OCjDi9LAPajlc5JbQOs3hQKBgQDmiBIDXQaqI1FeKl6u9I0U5tjDxb6UrZ2Hc9th+r5qccFrGzg2V5h3OS1MyeofprRAZBeY2t/BmTBOtdeEQ5A/ENlFVCynRUqmXrMCQnOuiX+pK4KOxJhzcAke6mPJEDOgBC1lHXXBkpsNWrymN4/ZKVI2C3bb3RaRfwCHNwBO4wKBgQC8vtAxceZ35Fz/+Avv7fse/kdcEfk43rj4BtAcQ6tqJR7HkRJfpm8o0S0hisAVXeRjb1VTQjMAW1gjrcgsQfyo5rhGL7xlz1LgMH2J1ip3dNggzUEkquMM3fv0thQLgAq4btEqCH6sfgsrxCrEU0KQHmHn2iR9eyzagoq3cHHGhQKBgBu8cVZgQeYEe8y1klDAcZz7LUdYqlZfER3z7Yg7T9+ksh2916SKI3jssyuS+401VGiO4lvssZEsaih+LmDmdBtyXoG93+V8K8AakrUJ47szJd3nszyUILd62k4S61CMl3mAJyoMQle42NjheuMQukjpdM+1z2Yiko2M1zZtgqb7AoGAbgbd3rUDIMji3eR/MPKN/VdFygpAOkK7mPp/vrpD5rCU7MlI6LFhA25M3MzBhLMjPEPefZaNnJujGcloc0RUQTGeImwZa1Acg8xAomVShCh9BUIhw3pKuWl+Qv0RWlLd7P3MuLATCALCCFVmiOPwXYsYj8u+kdeIIikPLDhEWvECgYB1jVcE1R0Z2Hy6QEFmQ0lLK1zX45UaHALZOV3/dYuUG6B3CgC4un8N6eIabear+CBSq91i6zryUY6HzVrDEJcqrpj6jn5lwxWEbZ2EZcwVbBlo/t8122NeonDcmlWtmcZNtEPb12WAmUntlZmT+3M3vZgBd/XvVao8AVuFIAaW0A==",
-    "name":  "Nexos Torre",
+    "name":  "Nexos",
     "short_name":  "Nexos",
-    "version":  "3.0.1",
-    "description":  "Nexos Torre v3.0 - AutenticaÃ§Ã£o SharePoint-exclusive com Chrome Identity API. SoluÃ§Ã£o corporativa integrada com Microsoft 365 para gestÃ£o de pedidos e automaÃ§Ãµes multi-plataforma.",
+    "version": "3.0.3",
+    "description":  "Nexos v3.0 - Autenticação SharePoint-exclusive com Chrome Identity API. Solução corporativa integrada com Microsoft 365 para gestão de pedidos e automações multi-plataforma.",
     "icons":  {
                   "16":  "images/logo.png",
                   "32":  "images/logo.png",
@@ -85,8 +85,8 @@
                                                            "core/auth/auth-helper.js",
                                                            "core/auth/auto-login-handler.js",
                                                            "core/auth/token-sync-diagnostic.js",
+                                                           "core/auth/token-vault-manager.js",
                                                            "core/auth/auth-token-service.js",
-                                                           "tests/token-vault-manager.js",
                                                            "core/auth/auth-token-service-v2.js",
                                                            "migrations/migrate-to-sharepoint.js",
                                                            "core/sharepoint/graph-client-init.js",
@@ -207,7 +207,7 @@
                                            "core/auth/msal-auth.js",
                                            "core/auth/unified-auth-service.js",
                                            "core/auth/unified-auth-manager.js",
-                                           "tests/token-vault-manager.js",
+                                           "core/auth/token-vault-manager.js",
                                            "core/auth/auth-token-service-v2.js",
                                            "core/auth/token-manager.js",
                                            "core/auth/oauth-client.js",
@@ -251,8 +251,7 @@
                             },
                             {
                                 "matches":  [
-                                                "*://control.instaleap.io/metrics*",
-                                                "*://control.instaleap.io/orders*"
+                                                "*://control.instaleap.io/*"
                                             ],
                                 "js":  [
                                            "inject-instaleap-order-filter.js"
