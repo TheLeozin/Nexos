@@ -1,14 +1,12 @@
 ﻿{
-    "version":  "3.0.5",
-    "url":  "https://github.com/TheLeozin/Nexos/releases/download/v3.0.5/nexos-3.0.5.zip",
-    "hash":  "sha256:f634e7a27637005ed89877a3c9c2e9386578977db1bbf43ad314600490931ea3",
-    "releaseDate":  "2026-05-21T15:39:12Z",
+    "version":  "3.0.6",
+    "url":  "https://github.com/TheLeozin/Nexos/releases/download/v3.0.6/nexos-3.0.6.zip",
+    "hash":  "sha256:32de742ae5f0e675d8f243a252c1081c9a1700459132dfb47d50b2fad555ddc7",
+    "releaseDate":  "2026-05-21T15:58:08Z",
     "minUpdater":  "1.0.0",
     "notes":  [
-                  "Auto-update migrado para onUpdateAvailable nativo do Chrome (sem polling PowerShell)",
-                  "Instalador: removido agendador de tarefas NexosUpdater",
-                  "Instalador: progresso de download em tempo real com Runspace dedicado",
-                  "Admin: CSP violations removidas de _renderUsuariosTable",
-                  "Admin: _getNexosGroupId simplificado"
+                  "Instalador WPF: progresso de download do ZIP em tempo real (MB baixados/total)",
+                  "Instalador WPF: removidas mensagens de install-task/uninstall-task extraidos",
+                  "Fluxo final sem registro de tarefa agendada no passo 5"
               ]
 }

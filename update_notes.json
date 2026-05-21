@@ -1,4 +1,9 @@
 ﻿{
+    "3.0.6":  [
+                  "Instalador WPF: progresso de download do ZIP em tempo real (MB baixados/total)",
+                  "Instalador WPF: removidas mensagens de install-task/uninstall-task extraidos",
+                  "Fluxo final sem registro de tarefa agendada no passo 5"
+              ],
     "3.0.5":  [
                   "Auto-update migrado para onUpdateAvailable nativo do Chrome (sem polling PowerShell)",
                   "Instalador: removido agendador de tarefas NexosUpdater",
