@@ -176,7 +176,7 @@ function Compare-Versions {
 }
 
 # -----------------------------------------------------------------------------
-# DOWNLOAD COM RETRY E TIMEOUT
+# DOWNLOAD COM RETRY, TIMEOUT E PROGRESSO
 # -----------------------------------------------------------------------------
 function Invoke-SafeDownload {
     param(
@@ -190,6 +190,20 @@ function Invoke-SafeDownload {
 
             $wc = New-Object System.Net.WebClient
             $wc.Headers.Add('User-Agent', 'NexosUpdater/1.0')
+
+            # Progresso: evento DownloadProgressChanged
+            $lastPct = -1
+            $wc.add_DownloadProgressChanged({
+                param($s, $e)
+                $pct = $e.ProgressPercentage
+                # Exibe apenas a cada 10% para não poluir o log
+                if ($pct -ne $script:lastPct -and ($pct % 10 -eq 0)) {
+                    $script:lastPct = $pct
+                    $recv = [math]::Round($e.BytesReceived / 1KB, 0)
+                    $total = if ($e.TotalBytesToReceive -gt 0) { [math]::Round($e.TotalBytesToReceive / 1KB, 0) } else { '?' }
+                    Write-Host "[$(Get-Date -Format 'HH:mm:ss')][INFO ] Download: $pct% ($recv KB / $total KB)"
+                }
+            })
 
             # Timeout via proxy assíncrono
             $task    = $wc.DownloadFileTaskAsync($Url, $Destination)

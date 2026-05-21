@@ -1,4 +1,11 @@
 ﻿{
+    "3.0.5":  [
+                  "Auto-update migrado para onUpdateAvailable nativo do Chrome (sem polling PowerShell)",
+                  "Instalador: removido agendador de tarefas NexosUpdater",
+                  "Instalador: progresso de download em tempo real com Runspace dedicado",
+                  "Admin: CSP violations removidas de _renderUsuariosTable",
+                  "Admin: _getNexosGroupId simplificado"
+              ],
     "3.0.3":  [
                   "fix: banner de update no monitor",
                   "fix: post-update reconhecido apos reload do Service Worker",

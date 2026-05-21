@@ -44,14 +44,12 @@ try {
 # --- URLs ------------------------------------------------------------------
 $RAW       = 'https://raw.githubusercontent.com/TheLeozin/Nexos/main'
 $UPD_URL   = "$RAW/updater/nexos-updater.ps1"
-$TASK_URL  = "$RAW/updater/install-task.ps1"
 $LOGO_URL  = "$RAW/images/logo_nome.png"
 
 # --- CAMINHOS --------------------------------------------------------------
 $UPD_DIR   = Join-Path $InstallPath 'updater'
 $EXT_DIR   = Join-Path $InstallPath 'extension'
 $UPD_FILE  = Join-Path $UPD_DIR 'nexos-updater.ps1'
-$TASK_FILE = Join-Path $UPD_DIR 'install-task.ps1'
 $VER_LOCK  = Join-Path $InstallPath 'version.lock'
 
 # --- PALETA ----------------------------------------------------------------
@@ -147,7 +145,6 @@ $STEP_DEFS = @(
     'Atualizador'
     'Baixando'
     'Instalando'
-    'Auto-update'
 )
 
 $SC = @()
@@ -283,6 +280,16 @@ $F.Controls.Add($LBL_NOTE)
 # ============================================================
 function DoUI { [System.Windows.Forms.Application]::DoEvents() }
 
+function Invoke-UiThread {
+    param([scriptblock]$Action)
+
+    if ($F -and $F.IsHandleCreated -and $F.InvokeRequired) {
+        [void]$F.BeginInvoke($Action)
+    } else {
+        & $Action
+    }
+}
+
 function Set-Step([int]$i, [string]$state) {
     $c = $SC[$i]
     switch ($state) {
@@ -313,26 +320,128 @@ function Set-Step([int]$i, [string]$state) {
 }
 
 function Add-Log([string]$msg) {
-    $ts = Get-Date -Format 'HH:mm:ss'
-    $LOG.AppendText("[$ts] $msg`n")
-    try { $LOG.ScrollToCaret() } catch {}
-    DoUI
+    Invoke-UiThread {
+        $ts = Get-Date -Format 'HH:mm:ss'
+        $LOG.AppendText("[$ts] $msg`n")
+        try { $LOG.ScrollToCaret() } catch {}
+        DoUI
+    }
 }
 
 function Set-Status([string]$msg, $col = $null) {
-    $STAT.Text = $msg
-    if ($col) { $STAT.ForeColor = $col } else { $STAT.ForeColor = $C_MUTED }
-    DoUI
+    Invoke-UiThread {
+        $STAT.Text = $msg
+        if ($col) { $STAT.ForeColor = $col } else { $STAT.ForeColor = $C_MUTED }
+        DoUI
+    }
 }
 
 function Set-Progress([int]$v) {
-    $PB.Value = [Math]::Min(100, [Math]::Max(0, $v))
-    DoUI
+    Invoke-UiThread {
+        $PB.Value = [Math]::Min(100, [Math]::Max(0, $v))
+        DoUI
+    }
 }
 
 function Update-Subtitle([string]$msg) {
-    $LBL_SUB.Text = $msg
-    DoUI
+    Invoke-UiThread {
+        $LBL_SUB.Text = $msg
+        DoUI
+    }
+}
+
+function Invoke-DownloadFileWithProgress {
+    param(
+        [Parameter(Mandatory = $true)][string]$Url,
+        [Parameter(Mandatory = $true)][string]$Destination,
+        [Parameter(Mandatory = $true)][string]$Label,
+        [Parameter(Mandatory = $true)][int]$ProgressStart,
+        [Parameter(Mandatory = $true)][int]$ProgressEnd
+    )
+
+    # Hashtable sincronizada: o Runspace de download escreve aqui,
+    # o thread da UI lê e atualiza os controles diretamente — sem chamadas cross-thread.
+    $shared = [hashtable]::Synchronized(@{
+        Percent  = 0
+        Received = [long]0
+        Total    = [long]0
+        Done     = $false
+        Error    = $null
+    })
+
+    $rs = [System.Management.Automation.Runspaces.RunspaceFactory]::CreateRunspace()
+    $rs.ApartmentState = 'STA'
+    $rs.ThreadOptions  = 'ReuseThread'
+    $rs.Open()
+    $rs.SessionStateProxy.SetVariable('shared', $shared)
+    $rs.SessionStateProxy.SetVariable('DownloadUrl', $Url)
+    $rs.SessionStateProxy.SetVariable('DownloadDest', $Destination)
+
+    $ps = [System.Management.Automation.PowerShell]::Create()
+    $ps.Runspace = $rs
+    [void]$ps.AddScript({
+        try {
+            $wc = New-Object System.Net.WebClient
+            $wc.Headers.Add('User-Agent', 'NexosInstaller/3.0')
+            $wc.Headers.Add('Cache-Control', 'no-cache')
+            $wc.add_DownloadProgressChanged({
+                param($s, $e)
+                $shared.Percent  = [int]$e.ProgressPercentage
+                $shared.Received = $e.BytesReceived
+                $shared.Total    = $e.TotalBytesToReceive
+            })
+            $task = $wc.DownloadFileTaskAsync($DownloadUrl, $DownloadDest)
+            $task.Wait()
+            $wc.Dispose()
+        } catch {
+            $inner = $_.Exception.InnerException
+            $shared.Error = if ($inner) { $inner.Message } else { $_.Exception.Message }
+        } finally {
+            $shared.Done = $true
+        }
+    })
+
+    $asyncResult = $ps.BeginInvoke()
+
+    $lastPct = -1
+    while (-not $shared.Done) {
+        $pct  = [int]$shared.Percent
+        $recv = $shared.Received
+        $tot  = $shared.Total
+
+        # Atualizar barra de progresso
+        $mappedPct = [int]($ProgressStart + (($ProgressEnd - $ProgressStart) * ([Math]::Max(0, $pct) / 100.0)))
+        $PB.Value = [Math]::Min(100, [Math]::Max(0, $mappedPct))
+
+        # Atualizar subtítulo com tamanho em tempo real (todo tick)
+        if ($tot -gt 0) {
+            $recvMB = [math]::Round($recv / 1MB, 1)
+            $totMB  = [math]::Round($tot  / 1MB, 1)
+            $LBL_SUB.Text = "$Label  —  $recvMB MB / $totMB MB  ($pct%)"
+        } elseif ($recv -gt 0) {
+            $recvMB = [math]::Round($recv / 1MB, 1)
+            $LBL_SUB.Text = "$Label  —  $recvMB MB baixados..."
+        }
+
+        # Log a cada 10%
+        if ($pct -ne $lastPct -and $pct -gt 0 -and ($pct % 10 -eq 0 -or $pct -eq 100)) {
+            $lastPct = $pct
+            $recvKB  = [math]::Round($recv / 1KB, 1)
+            $totKB   = if ($tot -gt 0) { [math]::Round($tot / 1KB, 1) } else { '?' }
+            $ts = Get-Date -Format 'HH:mm:ss'
+            $LOG.AppendText("[$ts] $Label - $pct% ($recvKB KB / $totKB KB)`n")
+            try { $LOG.ScrollToCaret() } catch {}
+        }
+
+        [System.Windows.Forms.Application]::DoEvents()
+        Start-Sleep -Milliseconds 80
+    }
+
+    try { $ps.EndInvoke($asyncResult) } catch {}
+    try { $rs.Close(); $rs.Dispose() } catch {}
+    try { $ps.Dispose() } catch {}
+
+    if ($shared.Error) { throw $shared.Error }
 }
 
 function Load-Logo {
@@ -392,23 +501,13 @@ function Start-Install {
     Update-Subtitle 'Baixando scripts do servidor Nexos...'
 
     try {
-        $wc = New-Object System.Net.WebClient
-        $wc.Headers.Add('User-Agent', 'NexosInstaller/3.0')
-        $wc.Headers.Add('Cache-Control', 'no-cache')
-
         Add-Log "Baixando nexos-updater.ps1..."
-        $wc.DownloadFile($UPD_URL, $UPD_FILE)
+        Invoke-DownloadFileWithProgress -Url $UPD_URL -Destination $UPD_FILE -Label 'nexos-updater.ps1' -ProgressStart 8 -ProgressEnd 20
         Add-Log "  OK ($([math]::Round((Get-Item $UPD_FILE).Length/1KB,1)) KB)"
 
-        Add-Log "Baixando install-task.ps1..."
-        $wc.DownloadFile($TASK_URL, $TASK_FILE)
-        Add-Log "  OK ($([math]::Round((Get-Item $TASK_FILE).Length/1KB,1)) KB)"
-
-        $wc.Dispose()
         Set-Progress 20
         Set-Step 1 'done'
     } catch {
-        try { $wc.Dispose() } catch {}
         Add-Log "ERRO: $($_.Exception.Message)"
         Set-Step 1 'error'
         Set-Status 'Falha no download de scripts.' $C_RED
@@ -420,11 +519,10 @@ function Start-Install {
     Update-Subtitle 'Consultando versao disponivel...'
 
     try {
+        Add-Log "Lendo latest.json..."
         $wc2 = New-Object System.Net.WebClient
         $wc2.Headers.Add('User-Agent', 'NexosInstaller/3.0')
         $wc2.Headers.Add('Cache-Control', 'no-cache')
-
-        Add-Log "Lendo latest.json..."
         $latest   = $wc2.DownloadString("$RAW/latest.json") | ConvertFrom-Json
         $zipUrl   = $latest.url
         $ver      = $latest.version
@@ -440,8 +538,8 @@ function Start-Install {
         Set-Progress 30
         DoUI
 
-        $wc2.DownloadFile($zipUrl, $zipFile)
-        $wc2.Dispose()
+        Invoke-DownloadFileWithProgress -Url $zipUrl -Destination $zipFile -Label "nexos-$ver.zip" -ProgressStart 30 -ProgressEnd 55
+        try { $wc2.Dispose() } catch {}
         $sizeMB = [math]::Round((Get-Item $zipFile).Length / 1MB, 2)
         Add-Log "  Download OK ($sizeMB MB)"
         Set-Progress 55
@@ -491,23 +589,6 @@ function Start-Install {
         Set-Status 'Falha na instalacao.' $C_RED
         Show-Error; return
     }
-
-    # -- STEP 4: Tarefa agendada --------------------------------------------
-    Set-Step 4 'active'
-    Update-Subtitle 'Registrando tarefa de auto-atualizacao...'
-    Set-Progress 86
-
-    $taskOk = $false
-    if (Test-Path $TASK_FILE) {
-        try {
-            Add-Log "Criando tarefa NexosUpdater..."
-            $p = Start-Process $PS_EXE -ArgumentList "-noprofile -executionpolicy bypass -file `"$TASK_FILE`" -InstallPath `"$InstallPath`"" -Wait -PassThru -WindowStyle Hidden
-            $taskOk = ($p.ExitCode -eq 0)
-            if ($taskOk) { Add-Log "  Tarefa criada" } else { Add-Log "  Aviso: cod $($p.ExitCode)" }
-        } catch { Add-Log "  Aviso: $($_.Exception.Message)" }
-    }
-
-    if ($taskOk) { Set-Step 4 'done' } else { Set-Step 4 'warn' }
 
     # -- FINAL --------------------------------------------------------------
     $verFinal = '?'
