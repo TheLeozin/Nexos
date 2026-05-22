@@ -1,14 +1,10 @@
 ﻿{
-    "version":  "3.0.8",
-    "url":  "https://github.com/TheLeozin/Nexos/releases/download/v3.0.8/nexos-3.0.8.zip",
-    "hash":  "sha256:0569b9ecee93106c9f7f15bf1e367de101165dac265889bbc0b4fcd7adb1df9a",
-    "releaseDate":  "2026-05-22T16:34:29Z",
+    "version":  "3.0.9",
+    "url":  "https://github.com/TheLeozin/Nexos/releases/download/v3.0.9/nexos-3.0.9.zip",
+    "hash":  "sha256:96e7959932776e91f5346ef588b6390ac1f1092a5e12a2f594f0f916b90cff26",
+    "releaseDate":  "2026-05-22T17:49:56Z",
     "minUpdater":  "1.0.0",
     "notes":  [
-                  "Auth: bloqueio local imediato quando solicitacao automatica falha",
-                  "Monitor: tratamento de 403 e bloqueio de sessao no SharePoint",
-                  "Update: fallback remoto a cada 2 minutos no service worker",
-                  "Monitor: ajuste responsivo de colunas, Slot e anotacao",
-                  "Content: exportacao de logManager/window.LogManager para compatibilidade"
+                  "Monitor: fallback nativo para solicitar acesso quando sem permissao no site"
               ]
 }

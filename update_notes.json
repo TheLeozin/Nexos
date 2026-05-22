@@ -1,4 +1,7 @@
 ﻿{
+    "3.0.9":  [
+                  "Monitor: fallback nativo para solicitar acesso quando sem permissao no site"
+              ],
     "3.0.8":  [
                   "Auth: bloqueio local imediato quando solicitacao automatica falha",
                   "Monitor: tratamento de 403 e bloqueio de sessao no SharePoint",
