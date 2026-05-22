@@ -1,12 +1,14 @@
 ﻿{
-    "version":  "3.0.7",
-    "url":  "https://github.com/TheLeozin/Nexos/releases/download/v3.0.7/nexos-3.0.7.zip",
-    "hash":  "sha256:6cd7db10ddae565b3adea41c0dc94ba686714c02955e53131f1219bdd3cc5033",
-    "releaseDate":  "2026-05-22T00:00:00Z",
+    "version":  "3.0.8",
+    "url":  "https://github.com/TheLeozin/Nexos/releases/download/v3.0.8/nexos-3.0.8.zip",
+    "hash":  "sha256:0569b9ecee93106c9f7f15bf1e367de101165dac265889bbc0b4fcd7adb1df9a",
+    "releaseDate":  "2026-05-22T16:34:29Z",
     "minUpdater":  "1.0.0",
     "notes":  [
-                  "Popup: botão principal alterado para Monitor de Pedidos com foco/abertura automática da guia",
-                  "Popup: sincronização de usuário/email com fallback de nexos-user-session em logins de outros contextos",
-                  "Auth: isAuthenticated com tratamento robusto para extension context invalidated no Picking"
+                  "Auth: bloqueio local imediato quando solicitacao automatica falha",
+                  "Monitor: tratamento de 403 e bloqueio de sessao no SharePoint",
+                  "Update: fallback remoto a cada 2 minutos no service worker",
+                  "Monitor: ajuste responsivo de colunas, Slot e anotacao",
+                  "Content: exportacao de logManager/window.LogManager para compatibilidade"
               ]
 }

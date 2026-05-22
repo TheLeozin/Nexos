@@ -1,4 +1,11 @@
 ﻿{
+    "3.0.8":  [
+                  "Auth: bloqueio local imediato quando solicitacao automatica falha",
+                  "Monitor: tratamento de 403 e bloqueio de sessao no SharePoint",
+                  "Update: fallback remoto a cada 2 minutos no service worker",
+                  "Monitor: ajuste responsivo de colunas, Slot e anotacao",
+                  "Content: exportacao de logManager/window.LogManager para compatibilidade"
+              ],
     "3.0.7":  [
                   "Popup: botão principal alterado para Monitor de Pedidos com foco/abertura automática da guia",
                   "Popup: sincronização de usuário/email com fallback de nexos-user-session em logins de outros contextos",
