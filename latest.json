@@ -1,12 +1,12 @@
 ﻿{
-    "version":  "3.0.6",
-    "url":  "https://github.com/TheLeozin/Nexos/releases/download/v3.0.6/nexos-3.0.6.zip",
-    "hash":  "sha256:32de742ae5f0e675d8f243a252c1081c9a1700459132dfb47d50b2fad555ddc7",
-    "releaseDate":  "2026-05-21T15:58:08Z",
+    "version":  "3.0.7",
+    "url":  "https://github.com/TheLeozin/Nexos/releases/download/v3.0.7/nexos-3.0.7.zip",
+    "hash":  "sha256:6cd7db10ddae565b3adea41c0dc94ba686714c02955e53131f1219bdd3cc5033",
+    "releaseDate":  "2026-05-22T00:00:00Z",
     "minUpdater":  "1.0.0",
     "notes":  [
-                  "Instalador WPF: progresso de download do ZIP em tempo real (MB baixados/total)",
-                  "Instalador WPF: removidas mensagens de install-task/uninstall-task extraidos",
-                  "Fluxo final sem registro de tarefa agendada no passo 5"
+                  "Popup: botão principal alterado para Monitor de Pedidos com foco/abertura automática da guia",
+                  "Popup: sincronização de usuário/email com fallback de nexos-user-session em logins de outros contextos",
+                  "Auth: isAuthenticated com tratamento robusto para extension context invalidated no Picking"
               ]
 }

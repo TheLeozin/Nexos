@@ -1,14 +1,12 @@
 ﻿{
-  "version": "3.0.3",
-  "url": "https://github.com/TheLeozin/Nexos/releases/download/v3.0.3/nexos-3.0.3.zip",
-  "hash": "sha256:205e8bfdb470feb56f43d8d9158e859d7f659b6196ba2fbced4252e97a177273",
-  "releaseDate": "2026-05-20T14:00:00Z",
-  "minUpdater": "1.0.0",
-  "notes": [
-    "feat: logo Nexos nos modais de update",
-    "feat: aba do instalador recebe foco automaticamente",
-    "feat: instrucao Clique em Abrir nexos-run apos disparar instalador",
-    "fix: modal descartavel em paginas regulares, bloqueante no monitor",
-    "fix: update nao abre mais CMD a cada 5 minutos"
-  ]
+    "version":  "3.0.7",
+    "url":  "https://github.com/TheLeozin/Nexos/releases/download/v3.0.7/nexos-3.0.7.zip",
+    "hash":  "sha256:6cd7db10ddae565b3adea41c0dc94ba686714c02955e53131f1219bdd3cc5033",
+    "releaseDate":  "2026-05-22T00:00:00Z",
+    "minUpdater":  "1.0.0",
+    "notes":  [
+                  "Popup: botão principal alterado para Monitor de Pedidos com foco/abertura automática da guia",
+                  "Popup: sincronização de usuário/email com fallback de nexos-user-session em logins de outros contextos",
+                  "Auth: isAuthenticated com tratamento robusto para extension context invalidated no Picking"
+              ]
 }

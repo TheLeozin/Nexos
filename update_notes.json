@@ -1,4 +1,9 @@
 ﻿{
+    "3.0.7":  [
+                  "Popup: botão principal alterado para Monitor de Pedidos com foco/abertura automática da guia",
+                  "Popup: sincronização de usuário/email com fallback de nexos-user-session em logins de outros contextos",
+                  "Auth: isAuthenticated com tratamento robusto para extension context invalidated no Picking"
+              ],
     "3.0.6":  [
                   "Instalador WPF: progresso de download do ZIP em tempo real (MB baixados/total)",
                   "Instalador WPF: removidas mensagens de install-task/uninstall-task extraidos",
