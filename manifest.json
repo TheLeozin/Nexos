@@ -3,7 +3,7 @@
     "key":  "MIIEvAIBADANBgkqhkiG9w0BAQEFAASCBKYwggSiAgEAAoIBAQCp98Gy7A+4SP7fVZUuA4bwGmnSW5cLHEviY9eYbTAy26XumzjhGuWqAXNw7uFEQRl6OfLqCriB/UAxrBGUyymd/R7nKYim/KdDIfJpwxLZWwfb42hg7HPer/m+GsE5uaU+1h4JvzalE1pI4INyCVvJ0ZhuVtGk1uoZZ0aH5IcCrxAF1QWtPvphHNNtZ3YuyZbFANE7CvOkmacp45MrTMyBzZKo7W/nDRub80z3kOwh9dDL/YBqX3w6qXRO/Dwr3843l8uCCDWfXWQXof8Vi4Znkx/wihiUtGAqh25YZFIN7kjW5ziqYkg/Yqv5gAXoR5jOk89iMDUwNA4oBrTyX43vAgMBAAECggEABeoVpuy49VAw8kOPn9zGjsdUhFnkjSHscBHKWEcAZNyozv8+wPKHKF3JjxX457+eK9clYUiDOB7AY5oZuIRDS/iZYTDcTPdAuMDPJyf/GWomAVxN7wV7WLXl6lwS+jfADMo1nGA3fhII071gRZEWzRSKidhijipeVgj2dtcYbZrsTE61vu65KQ+DbFsVANXLo3+1nH+xtSltEZdRfxa8ysN80hU2oPmsXZoksSV3HMH3xSR+zJvNZZBTeUWspFqBIZw2ENkzt3RKuKs99ZgrAS5r5OXV8jAi9hDhKEJF8aA0LL3VXELYU0UCeCHUUjG4OCjDi9LAPajlc5JbQOs3hQKBgQDmiBIDXQaqI1FeKl6u9I0U5tjDxb6UrZ2Hc9th+r5qccFrGzg2V5h3OS1MyeofprRAZBeY2t/BmTBOtdeEQ5A/ENlFVCynRUqmXrMCQnOuiX+pK4KOxJhzcAke6mPJEDOgBC1lHXXBkpsNWrymN4/ZKVI2C3bb3RaRfwCHNwBO4wKBgQC8vtAxceZ35Fz/+Avv7fse/kdcEfk43rj4BtAcQ6tqJR7HkRJfpm8o0S0hisAVXeRjb1VTQjMAW1gjrcgsQfyo5rhGL7xlz1LgMH2J1ip3dNggzUEkquMM3fv0thQLgAq4btEqCH6sfgsrxCrEU0KQHmHn2iR9eyzagoq3cHHGhQKBgBu8cVZgQeYEe8y1klDAcZz7LUdYqlZfER3z7Yg7T9+ksh2916SKI3jssyuS+401VGiO4lvssZEsaih+LmDmdBtyXoG93+V8K8AakrUJ47szJd3nszyUILd62k4S61CMl3mAJyoMQle42NjheuMQukjpdM+1z2Yiko2M1zZtgqb7AoGAbgbd3rUDIMji3eR/MPKN/VdFygpAOkK7mPp/vrpD5rCU7MlI6LFhA25M3MzBhLMjPEPefZaNnJujGcloc0RUQTGeImwZa1Acg8xAomVShCh9BUIhw3pKuWl+Qv0RWlLd7P3MuLATCALCCFVmiOPwXYsYj8u+kdeIIikPLDhEWvECgYB1jVcE1R0Z2Hy6QEFmQ0lLK1zX45UaHALZOV3/dYuUG6B3CgC4un8N6eIabear+CBSq91i6zryUY6HzVrDEJcqrpj6jn5lwxWEbZ2EZcwVbBlo/t8122NeonDcmlWtmcZNtEPb12WAmUntlZmT+3M3vZgBd/XvVao8AVuFIAaW0A==",
     "name":  "Nexos",
     "short_name":  "Nexos",
-    "version": "3.0.15",
+    "version":  "3.1.0",
     "description":  "Nexos v3.0 - Autenticação SharePoint-exclusive com Chrome Identity API. Solução corporativa integrada com Microsoft 365 para gestão de pedidos e automações multi-plataforma.",
     "icons":  {
                   "16":  "images/logo.png",
@@ -21,7 +21,10 @@
                         "alarms",
                         "webRequest",
                         "identity",
-                        "windows"
+                        "windows",
+                        "downloads",
+                        "sidePanel",
+                        "cookies"
                     ],
     "host_permissions":  [
                              "https://gpabr.sharepoint.com/*",
@@ -33,12 +36,17 @@
                              "https://avt-backend.instaleap.io/*",
                              "https://control.instaleap.io/*",
                              "https://api-gtw-prod.backoffice.gpa.digital/*",
+                             "https://api.backoffice.gpa.digital/*",
                              "https://picking-admin.backoffice.gpa.digital/*",
+                             "https://metabase.james.delivery/*",
                              "https://graph.microsoft.com/*",
                              "https://gpabr.sharepoint.com/*"
                          ],
     "background":  {
                        "service_worker":  "background.js"
+                   },
+    "side_panel":  {
+                       "default_path":  "monitor-pedidos-armazenados.html"
                    },
     "web_accessible_resources":  [
                                      {
@@ -46,6 +54,9 @@
                                                            "trees.json",
                                                            "stores.json",
                                                            "core/knowledge-base.json",
+                                                           "lib/fuse.bundle.js",
+                                                           "lib/zod.bundle.js",
+                                                           "core/schemas/nexos-schemas.js",
                                                            "core/smart-search.js",
                                                            "core/console-silencer.js",
                                                            "msal-browser.min.js",
@@ -55,6 +66,7 @@
                                                            "images/content/carro.png",
                                                            "images/content/caminhao.png",
                                                            "styles/nexos-design-system.css",
+                                                           "core/utils/jwt-utils.js",
                                                            "core/loader.js",
                                                            "core/graph-client.js",
                                                            "core/update-engine.js",
@@ -62,6 +74,7 @@
                                                            "core/nexos-ui-components.js",
                                                            "core/nexos-auth-system.js",
                                                            "core/nexos-user-manager.js",
+                                                           "core/nexos-timezone-utils.js",
                                                            "core/nexos-overlay-template.js",
                                                            "core/nexos-ai-assistant.js",
                                                            "core/expose-picking-overlay.js",
@@ -132,7 +145,8 @@
                                                            "tests/diagnostic-design-system.html",
                                                            "tests/diagnostic-design-system.js",
                                                            "content-99app.js",
-                                                           "inject-instaleap-order-filter.js"
+                                                           "inject-instaleap-order-filter.js",
+                                                           "inject-instaleap-chat-sender.js"
                                                        ],
                                          "matches":  [
                                                          "\u003call_urls\u003e"
@@ -140,7 +154,6 @@
                                      },
                                      {
                                          "resources":  [
-                                                           "admin.html",
                                                            "monitor-pedidos-armazenados.html",
                                                            "monitor-pedidos-armazenados.js",
                                                            "monitor-pedidos-armazenados.css",
@@ -193,7 +206,8 @@
                                                 "*://direct.uber.com/*",
                                                 "*://web.lalamove.com/*",
                                                 "*://entrega.99app.com/*",
-                                                "*://mapa.james.delivery/map*"
+                                                "*://mapa.james.delivery/map*",
+                                                "*://uraunify.gpabr.com/*"
                                             ],
                                 "css":  [
                                             "styles/nexos-design-system.css",
@@ -205,6 +219,7 @@
                                            "msal-browser.min.js",
                                            "config/azure-ad-config.js",
                                            "config/sharepoint-config.js",
+                                           "core/utils/jwt-utils.js",
                                            "core/auth/msal-auth.js",
                                            "core/auth/unified-auth-service.js",
                                            "core/auth/unified-auth-manager.js",
@@ -220,6 +235,9 @@
                                            "core/sharepoint/picking-sharepoint-manager.js",
                                            "core/picking-timeline-sharepoint.js",
                                            "core/picking-queue-sharepoint.js",
+                                           "lib/fuse.bundle.js",
+                                           "lib/zod.bundle.js",
+                                           "core/schemas/nexos-schemas.js",
                                            "core/smart-search.js",
                                            "core/nexos-ui-components.js",
                                            "core/nexos-auth-system.js",
@@ -245,6 +263,7 @@
                                                 "*://picking-admin.backoffice.gpa.digital/*"
                                             ],
                                 "js":  [
+                                           "core/nexos-timezone-utils.js",
                                            "core/auth/picking-admin-token-interceptor.js"
                                        ],
                                 "run_at":  "document_start",
@@ -259,6 +278,15 @@
                                        ],
                                 "run_at":  "document_idle",
                                 "world":  "MAIN"
+                            },
+                            {
+                                "matches":  [
+                                                "*://control.instaleap.io/*"
+                                            ],
+                                "js":  [
+                                           "inject-instaleap-chat-sender.js"
+                                       ],
+                                "run_at":  "document_idle"
                             },
                             {
                                 "matches":  [

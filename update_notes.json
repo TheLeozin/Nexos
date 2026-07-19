@@ -1,10 +1,19 @@
 ﻿{
-    "3.0.15": [
-                  "Fix: correcao de timezone (core/nexos-timezone-utils.js) injetado no Picking Admin",
-                  "Fix: opacidade do overlay de picking e do monitor de pedidos armazenados",
-                  "Fix: tratamento de mensagens assincronas (async/await em listeners)",
-                  "Ajustes em admin, auth (msal/token-vault) e instalador"
+    "3.1.0":  [
+                  "Chat da Instaleap: link de rastreio preenchido automaticamente no chat de suporte",
+                  "Atualizacao obrigatoria: a extensao passa a exigir a versao mais recente pra continuar em uso",
+                  "Painel admin: removido acesso de teste, versao de cada usuario visivel",
+                  "Corrigido: alerta do Picking agora chega pra quem deveria receber",
+                  "Corrigido: tracking do Uber nao e mais perdido quando a confirmacao demora",
+                  "Corrigido: pedidos pendentes sem envio voltam a ser limpos automaticamente apos 10min",
+                  "Pequenos ajustes visuais e uma surpresa escondida"
               ],
+    "3.0.15":  [
+                   "Fix: correcao de timezone (core/nexos-timezone-utils.js) injetado no Picking Admin",
+                   "Fix: opacidade do overlay de picking e do monitor de pedidos armazenados",
+                   "Fix: tratamento de mensagens assincronas (async/await em listeners)",
+                   "Ajustes em admin, auth (msal/token-vault) e instalador"
+               ],
     "3.0.9":  [
                   "Monitor: fallback nativo para solicitar acesso quando sem permissao no site"
               ],
