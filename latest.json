@@ -1,8 +1,8 @@
 ﻿{
     "version":  "3.1.0",
     "url":  "https://github.com/TheLeozin/Nexos/releases/download/v3.1.0/nexos-3.1.0.zip",
-    "hash":  "sha256:0ae9d2816d5936639e9b229730575f1e89686b5848419ba245a50b5dc43d35c2",
-    "releaseDate":  "2026-07-18T21:04:51Z",
+    "hash":  "sha256:5530e91560986554ca19ffd63cfc78837ab067d258c839eb9a69d757cca85066",
+    "releaseDate":  "2026-07-18T21:08:49Z",
     "minUpdater":  "1.0.0",
     "notes":  [
                   "Chat da Instaleap: link de rastreio preenchido automaticamente no chat de suporte",
