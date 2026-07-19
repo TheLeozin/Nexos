@@ -1,4 +1,8 @@
 ﻿{
+    "3.1.2":  [
+                  "Corrigido: botao \"Recarregar agora\" e o reload automatico agora aplicam a atualizacao na aba aberta de verdade",
+                  "Corrigido: apos atualizar, a aba nao fica mais rodando a versao antiga da extensao"
+              ],
     "3.1.1":  [
                   "Corrigido: usuario com acesso aprovado nao era mais barrado com tela de \"acesso pendente\" apos atualizar",
                   "Botao de recarregar apos atualizacao agora tambem recarrega a aba, limpando logs antigos",

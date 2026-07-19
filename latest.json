@@ -1,12 +1,11 @@
 ﻿{
-    "version":  "3.1.1",
-    "url":  "https://github.com/TheLeozin/Nexos/releases/download/v3.1.1/nexos-3.1.1.zip",
-    "hash":  "sha256:45d695849022bd8296fc12f90681b982b8bbcee0f4600fcbfe1d7e88d25492c8",
-    "releaseDate":  "2026-07-18T21:51:50Z",
+    "version":  "3.1.2",
+    "url":  "https://github.com/TheLeozin/Nexos/releases/download/v3.1.2/nexos-3.1.2.zip",
+    "hash":  "sha256:4322b31f25babab7860e287b958073a14e99685e4d8dbbab8cd4be597fc14cb6",
+    "releaseDate":  "2026-07-18T22:20:22Z",
     "minUpdater":  "1.0.0",
     "notes":  [
-                  "Corrigido: usuario com acesso aprovado nao era mais barrado com tela de \"acesso pendente\" apos atualizar",
-                  "Botao de recarregar apos atualizacao agora tambem recarrega a aba, limpando logs antigos",
-                  "Removida chamada de rede morta que gerava erro no console"
+                  "Corrigido: botao \"Recarregar agora\" e o reload automatico agora aplicam a atualizacao na aba aberta de verdade",
+                  "Corrigido: apos atualizar, a aba nao fica mais rodando a versao antiga da extensao"
               ]
 }
