@@ -1,4 +1,9 @@
 ﻿{
+    "3.1.1":  [
+                  "Corrigido: usuario com acesso aprovado nao era mais barrado com tela de \"acesso pendente\" apos atualizar",
+                  "Botao de recarregar apos atualizacao agora tambem recarrega a aba, limpando logs antigos",
+                  "Removida chamada de rede morta que gerava erro no console"
+              ],
     "3.1.0":  [
                   "Chat da Instaleap: link de rastreio preenchido automaticamente no chat de suporte",
                   "Atualizacao obrigatoria: a extensao passa a exigir a versao mais recente pra continuar em uso",

@@ -1,16 +1,12 @@
 ﻿{
-    "version":  "3.1.0",
-    "url":  "https://github.com/TheLeozin/Nexos/releases/download/v3.1.0/nexos-3.1.0.zip",
-    "hash":  "sha256:5530e91560986554ca19ffd63cfc78837ab067d258c839eb9a69d757cca85066",
-    "releaseDate":  "2026-07-18T21:08:49Z",
+    "version":  "3.1.1",
+    "url":  "https://github.com/TheLeozin/Nexos/releases/download/v3.1.1/nexos-3.1.1.zip",
+    "hash":  "sha256:45d695849022bd8296fc12f90681b982b8bbcee0f4600fcbfe1d7e88d25492c8",
+    "releaseDate":  "2026-07-18T21:51:50Z",
     "minUpdater":  "1.0.0",
     "notes":  [
-                  "Chat da Instaleap: link de rastreio preenchido automaticamente no chat de suporte",
-                  "Atualizacao obrigatoria: a extensao passa a exigir a versao mais recente pra continuar em uso",
-                  "Painel admin: removido acesso de teste, versao de cada usuario visivel",
-                  "Corrigido: alerta do Picking agora chega pra quem deveria receber",
-                  "Corrigido: tracking do Uber nao e mais perdido quando a confirmacao demora",
-                  "Corrigido: pedidos pendentes sem envio voltam a ser limpos automaticamente apos 10min",
-                  "Pequenos ajustes visuais e uma surpresa escondida"
+                  "Corrigido: usuario com acesso aprovado nao era mais barrado com tela de \"acesso pendente\" apos atualizar",
+                  "Botao de recarregar apos atualizacao agora tambem recarrega a aba, limpando logs antigos",
+                  "Removida chamada de rede morta que gerava erro no console"
               ]
 }
