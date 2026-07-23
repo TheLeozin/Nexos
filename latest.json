@@ -1,12 +1,11 @@
 ﻿{
-    "version":  "3.2.0",
-    "url":  "https://github.com/TheLeozin/Nexos/releases/download/v3.2.0/nexos-3.2.0.zip",
-    "hash":  "sha256:4692d62b44f0bacd8fa438ea87a748acea01be5701f049e35a5e394a60775522",
-    "releaseDate":  "2026-07-23T15:58:18Z",
+    "version":  "3.2.2",
+    "url":  "https://github.com/TheLeozin/Nexos/releases/download/v3.2.2/nexos-3.2.2.zip",
+    "hash":  "sha256:b4dba06e4bad204595bcaa57a241f036bec9d54f10581a407025148169bc6c33",
+    "releaseDate":  "2026-07-23T17:52:29Z",
     "minUpdater":  "1.0.0",
     "notes":  [
-                  "chore(release): bump to 3.2.0 Painel Passagem: notificacoes por limiar, comentarios com autor, fixes de auth/admin/SQL",
-                  "feat(painel-passagem): notificacoes por limiar, comentarios com autor/horario, filtros reorganizados",
-                  "chore(release): publish v3.1.3 assets"
+                  "chore(release): bump to 3.2.2 Throttling 429 (lider entre abas + batch) + fix critico de atualizacao travada",
+                  "fix(picking,auth,update-flow): reduz throttling 429 e corrige bloqueio permanente de atualizacao"
               ]
 }

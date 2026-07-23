@@ -1,4 +1,13 @@
 ﻿{
+    "3.2.2":  [
+                  "chore(release): bump to 3.2.2 Throttling 429 (lider entre abas + batch) + fix critico de atualizacao travada",
+                  "fix(picking,auth,update-flow): reduz throttling 429 e corrige bloqueio permanente de atualizacao"
+              ],
+    "3.2.1":  [
+                  "chore(release): bump to 3.2.1 TokenVaultManager: backoff de 429 compartilhado",
+                  "fix(auth): TokenVaultManager tambem respeita o backoff de 429 compartilhado",
+                  "chore(release): publish v3.2.0 assets"
+              ],
     "3.2.0":  [
                   "chore(release): bump to 3.2.0 Painel Passagem: notificacoes por limiar, comentarios com autor, fixes de auth/admin/SQL",
                   "feat(painel-passagem): notificacoes por limiar, comentarios com autor/horario, filtros reorganizados",
