@@ -1,11 +1,12 @@
 ﻿{
-    "version":  "3.1.3",
-    "url":  "https://github.com/TheLeozin/Nexos/releases/download/v3.1.3/nexos-3.1.3.zip",
-    "hash":  "sha256:503e19f6a5d64b3f1a6b623e9b8e34ac09c643c47c4b826f228026d72b52eefe",
-    "releaseDate":  "2026-07-18T22:34:39Z",
+    "version":  "3.2.0",
+    "url":  "https://github.com/TheLeozin/Nexos/releases/download/v3.2.0/nexos-3.2.0.zip",
+    "hash":  "sha256:4692d62b44f0bacd8fa438ea87a748acea01be5701f049e35a5e394a60775522",
+    "releaseDate":  "2026-07-23T15:58:18Z",
     "minUpdater":  "1.0.0",
     "notes":  [
-                  "Atualizacao obrigatoria: quando ha nova versao, a extensao bloqueia na hora ate atualizar",
-                  "Correcao aplicada junto do reload que agora funciona de verdade"
+                  "chore(release): bump to 3.2.0 Painel Passagem: notificacoes por limiar, comentarios com autor, fixes de auth/admin/SQL",
+                  "feat(painel-passagem): notificacoes por limiar, comentarios com autor/horario, filtros reorganizados",
+                  "chore(release): publish v3.1.3 assets"
               ]
 }
